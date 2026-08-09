@@ -1,0 +1,179 @@
+{
+  "tasks": [
+    {
+      "id": "t-001",
+      "title": "Bootstrap public FRWD repo (Apache-2.0, workspace, toolchain, CI)",
+      "description": "Wire the existing empty GitHub repo github.com/Entract/FRWD to this working copy and land the project definition as the first commit. Includes: Apache-2.0 LICENSE (canonical text) and NOTICE; strong public README.md; .gitignore (ignoring volatile Alepou machinery under plan/ but tracking plan/docs/); pnpm workspace (pnpm-workspace.yaml + packageManager field); TypeScript base config; Vitest config; Playwright config and browser-test skeleton; GitHub Actions CI running typecheck + unit tests; empty package/app/fixture/test directory scaffold; spec/ and docs/ placeholders with adr/. Also corrects 00_START_HERE.md sections 7-8, which wrongly place the design pack at docs/design/ and ADRs at /docs/adr/ - plan/docs/ is the authoritative home for the design pack.",
+      "status": "in-progress",
+      "dependsOn": [],
+      "assignee": "claude",
+      "category": "github",
+      "affectedPaths": [
+        "LICENSE",
+        "NOTICE",
+        "README.md",
+        ".gitignore",
+        "package.json",
+        "pnpm-workspace.yaml",
+        "tsconfig.base.json",
+        "vitest.config.ts",
+        "playwright.config.ts",
+        ".github/workflows/ci.yml",
+        "plan/docs/00_START_HERE.md"
+      ],
+      "canParallelize": false,
+      "planDoc": "10_MVP_IMPLEMENTATION_PLAN.md"
+    },
+    {
+      "id": "t-002",
+      "title": "packages/format - parse, serialize and stable object identity",
+      "description": "Framework-agnostic TypeScript package that reads and writes a .frwd document as semantic HTML. Provides: document parse into an in-memory view, stable data-frwd-id assignment and preservation, metadata block read/write, CSS/theme and embedded asset handling, deterministic serialization. Acceptance is semantic round-trip stability: a no-op open/save preserves document identity, all stable ids, semantic structure, content, CSS, metadata and embedded assets. Serialization must be deterministic (same input produces same bytes), but exact original whitespace and attribute formatting are NOT format invariants. No editor or UI framework dependencies.",
+      "status": "pending",
+      "dependsOn": [
+        "t-001"
+      ],
+      "assignee": "claude",
+      "category": "feature",
+      "affectedPaths": [
+        "packages/format"
+      ],
+      "canParallelize": false,
+      "planDoc": "02_FRWD_FORMAT_SPEC_V0_1.md"
+    },
+    {
+      "id": "t-003",
+      "title": "fixtures/minimal + conformance harness",
+      "description": "Land the minimal reference fixture and the conformance test harness that runs fixtures against packages/format. The harness must assert semantic round-trip stability and deterministic serialization, and be structured so new fixtures are cheap to add. This lands before sanitize/operations per the design pack instruction to write conformance fixtures early.",
+      "status": "pending",
+      "dependsOn": [
+        "t-002"
+      ],
+      "assignee": "claude",
+      "category": "feature",
+      "affectedPaths": [
+        "fixtures/minimal",
+        "tests/conformance"
+      ],
+      "canParallelize": false,
+      "planDoc": "11_TEST_AND_CONFORMANCE_PLAN.md"
+    },
+    {
+      "id": "t-004",
+      "title": "packages/sanitize - enforce the native no-script profile",
+      "description": "Framework-agnostic sanitizer enforcing the native .frwd profile: no arbitrary executable JavaScript, no event-handler attributes, no external script or unsafe URL schemes, allow-list of elements/attributes/CSS consistent with the security document. Includes security test fixtures for known injection vectors. Must be usable both on import (untrusted document) and on export.",
+      "status": "pending",
+      "dependsOn": [
+        "t-003"
+      ],
+      "assignee": "claude",
+      "category": "feature",
+      "affectedPaths": [
+        "packages/sanitize",
+        "tests/security"
+      ],
+      "canParallelize": false,
+      "planDoc": "09_SECURITY_TRUST_AND_PORTABILITY.md"
+    },
+    {
+      "id": "t-005",
+      "title": "packages/operations - deterministic semantic edit operations",
+      "description": "The AI-native editing protocol as deterministic, testable operations over stable document objects: insert/replace/delete/move block, set attributes, restyle without changing content, and the addressing scheme that targets data-frwd-id. Pure functions over the format model, fully covered by unit tests. No AI chat UI, no network, no model vendor dependency.",
+      "status": "pending",
+      "dependsOn": [
+        "t-004"
+      ],
+      "assignee": "claude",
+      "category": "feature",
+      "affectedPaths": [
+        "packages/operations"
+      ],
+      "canParallelize": false,
+      "planDoc": "06_AI_NATIVE_EDITING_PROTOCOL.md"
+    },
+    {
+      "id": "t-006",
+      "title": "packages/publisher + packages/runtime - .frwd.html emission",
+      "description": "Publisher that emits report.frwd.html from a .frwd document, embedding the trusted standard FRWD browser runtime (edit mode hooks, safe rich interactivity, Save As, print/export helpers). The runtime is framework-agnostic and self-contained; the published file must be a single portable HTML file that works fully offline and remains readable with JavaScript disabled.",
+      "status": "pending",
+      "dependsOn": [
+        "t-005"
+      ],
+      "assignee": "claude",
+      "category": "feature",
+      "affectedPaths": [
+        "packages/publisher",
+        "packages/runtime"
+      ],
+      "canParallelize": false,
+      "planDoc": "08_BROWSER_PUBLICATION_ARCHITECTURE.md"
+    },
+    {
+      "id": "t-007",
+      "title": "Cross-browser Playwright suite for .frwd.html",
+      "description": "Exercise publisher output against Chromium, Firefox and WebKit as soon as the publisher exists - not after the editor. Covers: offline load from file:// with no network, JavaScript-disabled readability, media playback, print stylesheet rendering, and Save As round-trip back through packages/format. Wired into CI.",
+      "status": "pending",
+      "dependsOn": [
+        "t-006"
+      ],
+      "assignee": "claude",
+      "category": "feature",
+      "affectedPaths": [
+        "tests/browser",
+        "playwright.config.ts"
+      ],
+      "canParallelize": true,
+      "planDoc": "11_TEST_AND_CONFORMANCE_PLAN.md"
+    },
+    {
+      "id": "t-008",
+      "title": "Designed reference fixtures (cv, scientific, business-report, rich-manual)",
+      "description": "Build the designed reference documents as a first-class part of development, not merely as tests. These must demonstrate that FRWD produces exceptionally good-looking documents on screen and in print, and they drive requirements back into format, sanitize and publisher. Each fixture runs through the conformance harness and the cross-browser suite.",
+      "status": "pending",
+      "dependsOn": [
+        "t-006"
+      ],
+      "assignee": "claude",
+      "category": "feature",
+      "affectedPaths": [
+        "fixtures"
+      ],
+      "canParallelize": true,
+      "planDoc": "13_EXAMPLE_DOCUMENTS.md"
+    },
+    {
+      "id": "t-009",
+      "title": "Public-facing docs: vision, architecture, ADR log, CONTRIBUTING",
+      "description": "Write the public renditions that a visitor to the repo needs: docs/vision.md, docs/architecture.md, the first ADRs recording decisions already made (single-HTML source, no ZIP container, no arbitrary script in the native profile, toolchain), and a brief CONTRIBUTING.md. These are condensed public documents derived from the plan/docs/ design pack, not copies of it. Also decide whether to promote the normative format spec into spec/FRWD-0.1.md at that point.",
+      "status": "pending",
+      "dependsOn": [
+        "t-001"
+      ],
+      "assignee": "claude",
+      "category": "github",
+      "affectedPaths": [
+        "docs",
+        "spec",
+        "CONTRIBUTING.md"
+      ],
+      "canParallelize": true,
+      "planDoc": "01_PRODUCT_VISION.md"
+    },
+    {
+      "id": "t-010",
+      "title": "apps/editor - minimal flowing edit surface",
+      "description": "Deliberately last. Choose the structured editing layer and UI framework only at this point, informed by what the format and operations work has taught us, and record the choice as an ADR. Vite is the build tool. Minimal scope: open a .frwd file, edit ordinary text naturally, insert a paragraph with correct reflow, move a media block, apply a restyle operation, export .frwd.html.",
+      "status": "pending",
+      "dependsOn": [
+        "t-006"
+      ],
+      "assignee": "claude",
+      "category": "feature",
+      "affectedPaths": [
+        "apps/editor"
+      ],
+      "canParallelize": false,
+      "planDoc": "07_EDITOR_ARCHITECTURE.md"
+    }
+  ],
+  "nextId": 11
+}

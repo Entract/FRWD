@@ -1,0 +1,36 @@
+# FRWD is a byte-sensitive format project: deterministic serialization and
+# conformance fixtures must not change meaning because someone checked the
+# repository out on a different operating system. Everything textual is stored
+# and checked out as LF.
+* text=auto eol=lf
+
+# FRWD documents and publications.
+*.frwd      text eol=lf
+*.frwd.html text eol=lf
+
+# Media embedded in or accompanying fixtures.
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.webp binary
+*.avif binary
+*.ico  binary
+*.woff binary
+*.woff2 binary
+*.ttf  binary
+*.otf  binary
+*.mp4  binary
+*.webm binary
+*.mp3  binary
+*.ogg  binary
+*.wav  binary
+*.pdf  binary
+
+# Generated - keep diffs collapsed in review.
+pnpm-lock.yaml linguist-generated=true
+
+# The design pack is documentation, not code, for language statistics.
+plan/docs/** linguist-documentation=true
+docs/**      linguist-documentation=true
+spec/**      linguist-documentation=true

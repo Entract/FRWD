@@ -1,0 +1,39 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build output
+dist/
+build/
+*.tsbuildinfo
+
+# Test and coverage output
+coverage/
+playwright-report/
+test-results/
+blob-report/
+.playwright/
+
+# Editor and OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Alepou working machinery.
+# The FRWD design pack under plan/docs/ is tracked deliberately - it is the
+# authoritative design and specification source for this project.
+plan/.runtime/
+plan/sessions/
+plan/chat-archives/
+plan/.outbox/
+plan/.init-packet.md
+plan/.planner-inbox.md
+plan/.planner-turn.md
+plan/.planner-session.json

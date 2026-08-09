@@ -1,0 +1,9 @@
+{
+  "//": "Solution-style root. Each package under packages/* and apps/* adds itself here as a project reference, so `tsc --build` typechecks the whole workspace in dependency order.",
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "types": ["node"]
+  },
+  "files": [],
+  "references": []
+}
