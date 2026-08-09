@@ -309,7 +309,7 @@
       "id": "t-018",
       "title": "Conformance rule: substantive content must not be trapped in a closed native details",
       "description": "The cross-browser suite established that no CSS can force-expand a closed native <details> in every engine - ::details-content covers Chromium and Firefox, WebKit has no equivalent - so substantive content inside one can silently vanish from a printout. That breaks the rich-media print contract, which says no component carrying substantive content may disappear from print. Add a checkable rule rather than leaving it as guidance: report a diagnostic when a <details> without open contains substantive content, and point the author at frwd-disclosure or <details open>. Decide which layer owns it - it is a print-contract rule rather than a safety-profile one, so it probably belongs in packages/format's structural validation. Needs a fixture and, once it exists, the WebKit skip in the browser suite can be replaced by a rule that makes the situation unreachable.",
-      "status": "in-progress",
+      "status": "done",
       "dependsOn": [],
       "assignee": "claude",
       "category": "feature",
@@ -318,13 +318,14 @@
         "fixtures"
       ],
       "canParallelize": true,
-      "planDoc": "05_RICH_MEDIA_AND_INTERACTIVITY.md"
+      "planDoc": "05_RICH_MEDIA_AND_INTERACTIVITY.md",
+      "completedCommit": "6c68455c1db5ead5b7b6bea24c9dc482346066bf"
     },
     {
       "id": "t-019",
-      "title": "Remaining designed reference documents (cv, scientific, rich-manual)",
-      "description": "The rest of the designed corpus, each its own shippable slice. cv: dense typographic layout and print fidelity. scientific: MathML equations, numbered figures, tables and cross-references. rich-manual: the one that matters most for the thesis, because the flagship report has no time-based media - embedded video and audio with poster frames, a gallery, and print fallbacks, all self-contained as data URLs, proving rich media feels native rather than bolted on. Same rules as t-008: no document-type-specific format features, only HTML, CSS and existing FRWD primitives, and every document must pass structural and safety conformance plus the cross-browser suite.",
-      "status": "pending",
+      "title": "Rich manual: time-based media in a flowing document",
+      "description": "The part of the FRWD thesis not yet proved: time-based media can be a natural part of a flowing document rather than an attachment or a link. A designed service manual with real instructional prose, an embedded video at the step it belongs to, poster frame and caption, embedded audio where it makes contextual sense, a small gallery, a safety callout, a disclosure, print fallbacks for every time-based object, responsive behaviour and no external resources. Media assets are deliberately tiny - enough to prove the interaction, not a demo reel - and embedded as data URLs, so no Git LFS. No new FRWD primitives unless the existing model genuinely cannot express something essential; if the fixture exposes a missing primitive, stop and record why first. The scientific and cv documents follow as separate slices.",
+      "status": "in-progress",
       "dependsOn": [],
       "assignee": "claude",
       "category": "feature",
@@ -333,7 +334,22 @@
       ],
       "canParallelize": true,
       "planDoc": "13_EXAMPLE_DOCUMENTS.md"
+    },
+    {
+      "id": "t-020",
+      "title": "Diagnose Firefox audio decode in the rich manual",
+      "description": "Firefox plays the embedded video in fixtures/rich-manual/field-calibration.frwd but leaves the audio at readyState 0. A standalone probe shows Firefox decoding the same Ogg and MP3 from data: URLs without complaint, and decoding them from file:// URLs fails in the same probe - so the encoding is fine and data: URLs are fine, and something about the element configuration or the document context is not. Worth understanding rather than working around, because self-contained audio is part of the portability claim: if there is a real constraint on how audio must be declared for it to work everywhere, the format should say so. The browser suite currently skips this one assertion in Firefox with a pointer here.",
+      "status": "pending",
+      "dependsOn": [],
+      "assignee": "claude",
+      "category": "feature",
+      "affectedPaths": [
+        "fixtures/rich-manual",
+        "tests/browser"
+      ],
+      "canParallelize": true,
+      "planDoc": "05_RICH_MEDIA_AND_INTERACTIVITY.md"
     }
   ],
-  "nextId": 20
+  "nextId": 21
 }

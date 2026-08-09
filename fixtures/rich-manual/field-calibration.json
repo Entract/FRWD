@@ -1,0 +1,9 @@
+{
+  "title": "Field calibration — HX-40 flow meter",
+  "description": "Time-based media as part of the document rather than an attachment: a video inside the step it explains, an audio reference tone inside the check that uses it, a gallery of three seat conditions, a safety callout and a disclosure. Every moving object has a static substitute that appears in print. All media is embedded; nothing is fetched.",
+  "conforming": true,
+  "canonical": true,
+  "expectedDiagnostics": [],
+  "profileConforming": true,
+  "expectedProfileDiagnostics": []
+}
