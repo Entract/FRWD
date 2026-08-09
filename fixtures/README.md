@@ -26,12 +26,23 @@ particular and would quietly pass whatever the implementation happened to do.
   "description": "Why this document exists and what it isolates.",
   "conforming": true,
   "canonical": true,
-  "expectedDiagnostics": []
+  "expectedDiagnostics": [],
+  "profileConforming": true,
+  "expectedProfileDiagnostics": []
 }
 ```
 
-`expectedDiagnostics` is the **exact** set of distinct diagnostic codes the
-document should produce, so each defective fixture isolates one defect.
+`expectedDiagnostics` (structural, from `@frwd/format`) and
+`expectedProfileDiagnostics` (native safety profile, from `@frwd/sanitize`) are
+each the **exact** set of distinct codes the document should produce, so a
+fixture isolates one defect rather than accumulating noise.
+
+The two profile fields default to "clean", which means every fixture is held to
+the safety profile unless it exists to violate it — a stray remote URL in a
+designed reference document fails the suite rather than shipping.
+
+A fixture may also set `inspectOptions`, so it can exercise a configurable limit
+without shipping a file large enough to trip the default one.
 
 ## Canonical form
 
@@ -60,10 +71,11 @@ just as conforming, and would carry `"canonical": false`. See spec §21.
 |---|---|
 | `minimal/` | Smallest document exercising every structural rule. |
 | `invalid/` | One structural defect each: missing doctype, missing version, unsupported major version, missing document root, malformed manifest, duplicate node id, missing stable id. |
+| `security/` | Structurally valid documents that break the native safety profile: inline and remote script, event handlers, `javascript:` URLs plain and obfuscated, SVG script, meta refresh, iframe, `base`, HTML data URLs, remote and relative images, `@import`, remote fonts and background images, and an oversized embedded asset. |
 | `cv/` | Planned — dense typographic layout, print fidelity. |
 | `scientific/` | Planned — equations, figures, tables, cross-references. |
 | `business-report/` | Planned — charts, data, callouts, cover design. |
 | `rich-manual/` | Planned — video, audio, galleries, interactive disclosure. |
 
-`minimal/` and `invalid/` landed with task `t-003`. The designed set arrives with
-`t-008`; security fixtures belong to `t-004`.
+`minimal/` and `invalid/` landed with task `t-003`, `security/` with `t-004`. The
+designed set arrives with `t-008`.

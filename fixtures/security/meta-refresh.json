@@ -1,0 +1,11 @@
+{
+  "title": "meta-refresh",
+  "description": "A meta refresh, which navigates with no user action at all.",
+  "conforming": true,
+  "canonical": true,
+  "expectedDiagnostics": [],
+  "profileConforming": false,
+  "expectedProfileDiagnostics": [
+    "meta-refresh"
+  ]
+}

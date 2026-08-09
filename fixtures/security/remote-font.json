@@ -1,0 +1,11 @@
+{
+  "title": "remote-font",
+  "description": "An @font-face pulling a font over the network. The quietest tracker in CSS.",
+  "conforming": true,
+  "canonical": true,
+  "expectedDiagnostics": [],
+  "profileConforming": false,
+  "expectedProfileDiagnostics": [
+    "css-external-resource"
+  ]
+}

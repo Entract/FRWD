@@ -1,0 +1,11 @@
+{
+  "title": "inline-script",
+  "description": "An executable inline <script>. A native FRWD is data, not software: nothing in it executes.",
+  "conforming": true,
+  "canonical": true,
+  "expectedDiagnostics": [],
+  "profileConforming": false,
+  "expectedProfileDiagnostics": [
+    "executable-script"
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "title": "obfuscated-javascript-link",
+  "description": "The same javascript: URL with a newline inside the scheme. Browsers strip it before parsing, so a naive prefix check misses it.",
+  "conforming": true,
+  "canonical": true,
+  "expectedDiagnostics": [],
+  "profileConforming": false,
+  "expectedProfileDiagnostics": [
+    "unsafe-url-scheme"
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "title": "html-data-url",
+  "description": "A data URL carrying text/html. Self-contained, and still a program.",
+  "conforming": true,
+  "canonical": true,
+  "expectedDiagnostics": [],
+  "profileConforming": false,
+  "expectedProfileDiagnostics": [
+    "unsafe-data-url"
+  ]
+}

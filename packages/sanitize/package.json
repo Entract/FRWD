@@ -1,0 +1,25 @@
+{
+  "name": "@frwd/sanitize",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Enforce the FRWD native safety profile. Inspect without mutating; repair only when asked.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc --build"
+  },
+  "dependencies": {
+    "@frwd/format": "workspace:*",
+    "postcss": "^8.5.26",
+    "postcss-value-parser": "^4.2.0"
+  }
+}

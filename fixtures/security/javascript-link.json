@@ -1,0 +1,11 @@
+{
+  "title": "javascript-link",
+  "description": "A javascript: URL in an ordinary-looking link.",
+  "conforming": true,
+  "canonical": true,
+  "expectedDiagnostics": [],
+  "profileConforming": false,
+  "expectedProfileDiagnostics": [
+    "unsafe-url-scheme"
+  ]
+}

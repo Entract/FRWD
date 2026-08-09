@@ -1,0 +1,12 @@
+{
+  "title": "remote-script",
+  "description": "A remote <script src>. Both executable and a network dependency, so it reports as both.",
+  "conforming": true,
+  "canonical": true,
+  "expectedDiagnostics": [],
+  "profileConforming": false,
+  "expectedProfileDiagnostics": [
+    "executable-script",
+    "external-resource"
+  ]
+}

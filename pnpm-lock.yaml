@@ -11,6 +11,9 @@ importers:
       '@frwd/format':
         specifier: workspace:*
         version: link:packages/format
+      '@frwd/sanitize':
+        specifier: workspace:*
+        version: link:packages/sanitize
       '@playwright/test':
         specifier: ^1.62.1
         version: 1.62.1
@@ -32,6 +35,18 @@ importers:
       parse5:
         specifier: ^8.0.1
         version: 8.0.1
+
+  packages/sanitize:
+    dependencies:
+      '@frwd/format':
+        specifier: workspace:*
+        version: link:../format
+      postcss:
+        specifier: ^8.5.26
+        version: 8.5.26
+      postcss-value-parser:
+        specifier: ^4.2.0
+        version: 4.2.0
 
 packages:
 
@@ -408,6 +423,9 @@ packages:
     resolution: {integrity: sha512-0M+L3LAD8/nm554LOla9Ayx0j0tmFZ0FBcoQ7F1VuVHpM/XpiC8RcDzBQB8W5+hA8L22THxELzeF+2WcUzvcLg==}
     engines: {node: '>=20'}
     hasBin: true
+
+  postcss-value-parser@4.2.0:
+    resolution: {integrity: sha512-1NNCs6uurfkVbeXG4S8JFT9t19m45ICnif8zWLd5oPSZ50QnwMfK+H3jv408d4jw/7Bttv5axS5IiHoLaVNHeQ==}
 
   postcss@8.5.26:
     resolution: {integrity: sha512-u82N74LFzG8ca+dD8puPnplTXoGH4fTPpVGuIbt36G3qvNlkvfD0lEAZSxaly3KX8TS/L1A1gsCEmvKmBcVbkQ==}
@@ -835,6 +853,8 @@ snapshots:
       playwright-core: 1.62.1
     optionalDependencies:
       fsevents: 2.3.2
+
+  postcss-value-parser@4.2.0: {}
 
   postcss@8.5.26:
     dependencies:

@@ -1,0 +1,25 @@
+<!DOCTYPE html><html data-frwd-version="0.1" lang="en"><head>
+<meta charset="utf-8">
+<meta content="c00000010-0000-4000-8000-000000000001" name="frwd-document-id">
+<title>Unsafe iframe</title>
+<script id="frwd-manifest" type="application/frwd+json">
+{
+  "format": "frwd",
+  "version": "0.1",
+  "documentId": "c00000010-0000-4000-8000-000000000001",
+  "title": "Unsafe iframe",
+  "created": "2026-08-09T09:00:00Z",
+  "modified": "2026-08-09T09:00:00Z"
+}
+</script>
+</head>
+<body>
+<main data-frwd-document="">
+<article data-frwd-id="c00000010-0000-4000-8000-000000000002">
+<h1 data-frwd-id="c00000010-0000-4000-8000-000000000003">Unsafe iframe</h1>
+<p data-frwd-id="c0000010-0000-4000-8000-000000000004">Below is an embedded frame.</p>
+<iframe src="https://example.invalid/embed" title="Embedded"></iframe>
+</article>
+</main>
+
+</body></html>

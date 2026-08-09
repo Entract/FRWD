@@ -58,7 +58,7 @@ Early. The specification is at draft 0.1 and the format will change before it is
 | Component | State |
 |---|---|
 | `packages/format` | Parse, serialize, stable identity, validation |
-| `packages/sanitize` | Not started — enforces the native no-script profile |
+| `packages/sanitize` | Native safety profile: inspection, repair, composed conformance |
 | `packages/operations` | Not started — deterministic semantic edit operations |
 | `packages/publisher` + `runtime` | Not started — `.frwd.html` emission |
 | `apps/editor` | Not started — deliberately last |

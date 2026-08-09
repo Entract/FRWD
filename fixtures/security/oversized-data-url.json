@@ -1,0 +1,14 @@
+{
+  "title": "oversized-data-url",
+  "description": "An embedded asset above the configured size limit. A warning rather than an error: the limit is policy, so this fixture sets its own.",
+  "conforming": true,
+  "canonical": true,
+  "expectedDiagnostics": [],
+  "profileConforming": true,
+  "expectedProfileDiagnostics": [
+    "oversized-data-url"
+  ],
+  "inspectOptions": {
+    "maxDataUrlBytes": 64
+  }
+}

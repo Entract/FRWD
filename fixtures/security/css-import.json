@@ -1,0 +1,11 @@
+{
+  "title": "css-import",
+  "description": "An @import in the document stylesheet: a remote stylesheet by another name.",
+  "conforming": true,
+  "canonical": true,
+  "expectedDiagnostics": [],
+  "profileConforming": false,
+  "expectedProfileDiagnostics": [
+    "css-import"
+  ]
+}

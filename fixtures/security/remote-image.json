@@ -1,0 +1,11 @@
+{
+  "title": "remote-image",
+  "description": "An <img> pointing at a remote host. Opening the document would announce the reader to a third party.",
+  "conforming": true,
+  "canonical": true,
+  "expectedDiagnostics": [],
+  "profileConforming": false,
+  "expectedProfileDiagnostics": [
+    "external-resource"
+  ]
+}

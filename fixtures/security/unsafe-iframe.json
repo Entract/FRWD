@@ -1,0 +1,12 @@
+{
+  "title": "unsafe-iframe",
+  "description": "An <iframe>: a whole second document, loaded from elsewhere, inside this one.",
+  "conforming": true,
+  "canonical": true,
+  "expectedDiagnostics": [],
+  "profileConforming": false,
+  "expectedProfileDiagnostics": [
+    "external-resource",
+    "forbidden-element"
+  ]
+}

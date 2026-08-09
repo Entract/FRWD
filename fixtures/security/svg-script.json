@@ -1,0 +1,11 @@
+{
+  "title": "svg-script",
+  "description": "A <script> hidden inside inline SVG, where it is easy to overlook.",
+  "conforming": true,
+  "canonical": true,
+  "expectedDiagnostics": [],
+  "profileConforming": false,
+  "expectedProfileDiagnostics": [
+    "executable-script"
+  ]
+}

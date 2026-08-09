@@ -1,0 +1,11 @@
+{
+  "title": "css-remote-url",
+  "description": "A remote background image in CSS, and the same trick in an inline style attribute.",
+  "conforming": true,
+  "canonical": true,
+  "expectedDiagnostics": [],
+  "profileConforming": false,
+  "expectedProfileDiagnostics": [
+    "css-external-resource"
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "title": "relative-image",
+  "description": "An <img> pointing at a relative path. Not remote, but not in the file either: the recipient does not have it.",
+  "conforming": true,
+  "canonical": true,
+  "expectedDiagnostics": [],
+  "profileConforming": false,
+  "expectedProfileDiagnostics": [
+    "external-resource"
+  ]
+}

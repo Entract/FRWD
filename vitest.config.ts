@@ -7,6 +7,7 @@ export default defineConfig({
       // Cross-package imports resolve to source, so tests never require a build
       // step. Published consumers still get dist via each package's exports.
       "@frwd/format": fileURLToPath(new URL("./packages/format/src/index.ts", import.meta.url)),
+      "@frwd/sanitize": fileURLToPath(new URL("./packages/sanitize/src/index.ts", import.meta.url)),
     },
   },
   test: {

@@ -1,0 +1,11 @@
+{
+  "title": "event-handler",
+  "description": "An inline event-handler attribute. Executable script wearing an attribute's clothing.",
+  "conforming": true,
+  "canonical": true,
+  "expectedDiagnostics": [],
+  "profileConforming": false,
+  "expectedProfileDiagnostics": [
+    "event-handler-attribute"
+  ]
+}

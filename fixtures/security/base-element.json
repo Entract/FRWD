@@ -1,0 +1,11 @@
+{
+  "title": "base-element",
+  "description": "A <base> element, which silently changes how every other URL in the document resolves.",
+  "conforming": true,
+  "canonical": true,
+  "expectedDiagnostics": [],
+  "profileConforming": false,
+  "expectedProfileDiagnostics": [
+    "forbidden-element"
+  ]
+}

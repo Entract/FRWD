@@ -28,8 +28,22 @@ export interface FixtureExpectations {
    * conforming and would carry false here.
    */
   canonical: boolean;
-  /** Exact set of distinct diagnostic codes the document should produce. */
+  /** Exact set of distinct structural diagnostic codes the document should produce. */
   expectedDiagnostics: string[];
+
+  /**
+   * Whether the document should satisfy the native safety profile. Defaults to
+   * true, so every fixture is held to it unless it exists to violate it.
+   */
+  profileConforming: boolean;
+  /** Exact set of distinct safety-profile diagnostic codes. Defaults to none. */
+  expectedProfileDiagnostics: string[];
+  /**
+   * Options for the profile inspection, so a fixture can exercise a
+   * configurable limit without shipping a file large enough to trip the
+   * default one.
+   */
+  inspectOptions?: { maxDataUrlBytes?: number };
 }
 
 export interface Fixture {
@@ -75,6 +89,9 @@ function readExpectations(frwdPath: string): FixtureExpectations {
     conforming: parsed.conforming,
     canonical: parsed.canonical ?? true,
     expectedDiagnostics: parsed.expectedDiagnostics,
+    profileConforming: parsed.profileConforming ?? true,
+    expectedProfileDiagnostics: parsed.expectedProfileDiagnostics ?? [],
+    ...(parsed.inspectOptions === undefined ? {} : { inspectOptions: parsed.inspectOptions }),
   };
 }
 
