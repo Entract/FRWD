@@ -56,6 +56,40 @@ Stale operations must be rejected or explicitly rebased.
 }
 ```
 
+## 5a. Three layers, and why the distinction matters
+
+The protocol below is easy to over-extend. Keeping these three apart is what stops FRWD from quietly becoming a design system.
+
+### Core FRWD operations
+
+A small, closed set of deterministic operations over the document model: replace text, replace a node, insert, delete, move, set an attribute, set a theme token. They are normative, they mean the same thing in every conforming implementation, and every one of them is expressible against any FRWD document without knowing anything about that document's design.
+
+### Document-defined style classes and variants
+
+`wide`, `main-sidebar`, `lead`, `safety` — these are classes a document or theme chooses. They are **not** FRWD concepts, and they do not become FRWD concepts merely because a reference fixture uses them. Two conforming FRWD documents may share no class names at all.
+
+The mechanism for changing them already exists and needs no new vocabulary:
+
+```json
+{ "op": "set_attribute", "target": "figure-uuid", "name": "class", "value": "wide" }
+```
+
+Standardising an enumeration of variants at format level would freeze one design vocabulary into the format and make every document that disagreed with it non-idiomatic. FRWD provides safe mechanisms for changing document-owned design; it does not standardise the design vocabulary of individual documents.
+
+### High-level agent and editor tools
+
+Convenience sits here, above the protocol rather than inside it. A tool such as:
+
+```text
+set_figure_variant(figure_id, "wide")
+```
+
+is an editor or agent affordance. It inspects which variants the current document's stylesheet actually defines, decides what to do, and **compiles down to core operations** — in that example, a single `set_attribute`. It is free to be heuristic, model-driven and document-specific, because nothing downstream depends on it: the transaction that reaches the document is still made of core operations, and is still atomic, staged and validated.
+
+The test for which layer something belongs to: *could two conforming implementations disagree about what it should do?* If yes, it is a tool, not an operation.
+
+Deferred for the same reason: `set_print_target_pages` is an optimisation goal rather than a deterministic document operation — "make this fit two pages" has many valid answers and depends on the rendering engine — and arbitrary stylesheet-region replacement is a large hole in the safety story with no demonstrated need yet.
+
 ## 5. Core operations
 
 ### Replace text
@@ -127,19 +161,35 @@ Used for section contents or list items.
 
 Use controlled semantic variants.
 
-### Patch theme token
+### Set theme token
+
+Changes a CSS custom property in the document stylesheet. The one style operation in v0.1.
 
 ```json
 {
   "op": "set_theme_token",
-  "name": "--frwd-content-width",
-  "value": "860px"
+  "name": "--accent",
+  "value": "#2458a6",
+  "scope": "default"
 }
 ```
 
+`scope` is `default` or `dark`, and is explicit rather than inferred. Designed documents pair a light value with a `prefers-color-scheme: dark` counterpart under the same token name, so "set --accent" is not a question that can be answered by position; an operation that picked one would silently change the wrong half of a theme.
+
+The stylesheet is edited through a CSS syntax tree, never by string replacement. Editing CSS with a regular expression is guessing, and a guess that lands inside a declaration produces a stylesheet nobody wrote.
+
+Rules:
+
+- the token name MUST be a custom property, beginning `--`;
+- if more than one `:root` rule in the requested scope declares the token, the operation is REFUSED rather than resolved by source order;
+- if the scope has several `:root` rules and none declares the token, it is REFUSED, because there is no non-arbitrary place to add it;
+- if the scope has no `:root` rule at all, one is created, which for `dark` means creating the media query too;
+- the resulting stylesheet MUST satisfy the native CSS safety profile, so a token value cannot smuggle in a remote reference;
+- the operation is rejected under `styleLocked` and permitted under `contentLocked`, because it changes appearance and no content.
+
 ### Replace stylesheet region
 
-Advanced AI/design operation, subject to CSS sanitization.
+Deferred. See section 5a.
 
 ### Add/replace asset
 
@@ -225,16 +275,17 @@ Do not send megabytes of embedded video/base64 to the model.
 
 ## 11. High-level layout tools
 
-Useful safe tools:
+These are tools, not operations - the third layer of section 5a. They live in an editor or an agent, they may be heuristic and document-specific, and they compile down to core operations before anything reaches a document.
 
 ```text
-set_layout_variant(section_id, "main-sidebar")
-set_figure_variant(figure_id, "wide")
-set_document_theme(theme_patch)
-set_print_target_pages(2)
+set_layout_variant(section_id, variant)   -> set_attribute(section_id, "class", ...)
+set_figure_variant(figure_id, variant)    -> set_attribute(figure_id, "class", ...)
+set_document_theme(theme_patch)           -> one set_theme_token per token
 ```
 
-These compile to controlled HTML/CSS changes.
+The variant names are whatever the document's own stylesheet defines. A tool discovers them by reading that stylesheet; it does not consult a list in this specification, because there is deliberately no such list.
+
+`set_print_target_pages` is deferred. Fitting a document to a page count is an optimisation goal with many valid answers, dependent on the rendering engine - which makes it a job for a tool that can measure and iterate, and a poor fit for a deterministic operation.
 
 ## 12. AI-created documents
 

@@ -22,8 +22,10 @@ test("renders MathML as mathematics", async ({ page }) => {
   // This is the semantic check - an engine that fell back to plain text would
   // put them side by side - and it needs no magic pixel threshold.
   const stacked = await page.locator("math mfrac").evaluate((node) => {
-    const parts = [...node.children].map((child) => child.getBoundingClientRect());
-    return parts.length === 2 && parts[0].bottom <= parts[1].top + 1;
+    const parts = Array.from(node.children).map((child) => child.getBoundingClientRect());
+    const [numerator, denominator] = parts;
+    if (!numerator || !denominator || parts.length !== 2) return false;
+    return numerator.bottom <= denominator.top + 1;
   });
   expect(stacked).toBe(true);
 

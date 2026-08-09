@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@frwd/format": "workspace:*",
-    "@frwd/sanitize": "workspace:*"
+    "@frwd/sanitize": "workspace:*",
+    "postcss": "^8.5.26"
   }
 }

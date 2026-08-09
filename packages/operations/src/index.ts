@@ -23,6 +23,8 @@
 
 export { apply, commitPrepared, currentRevision, preview, PROTOCOL, PROTOCOL_VERSION } from "./transaction.js";
 
+export { readThemeToken, setThemeToken } from "./theme.js";
+
 export type {
   ApplyOptions,
   CommitResult,
@@ -38,6 +40,8 @@ export type {
   ReplaceNodeOperation,
   ReplaceTextOperation,
   SetAttributeOperation,
+  SetThemeTokenOperation,
+  ThemeScope,
   TransactionChange,
   TransactionResult,
 } from "./types.js";

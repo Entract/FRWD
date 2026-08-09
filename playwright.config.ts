@@ -16,6 +16,13 @@ export default defineConfig({
   // Documents that embed video and audio take real time to load in a real
   // browser; the default 30s is tight once several run in parallel.
   timeout: 60_000,
+  // Same reason: a locator assertion against a document carrying embedded media
+  // can outlast the default 5s while the engine is still settling.
+  expect: { timeout: 15_000 },
+  // Four projects loading documents with embedded video and audio saturate one
+  // machine, and a page that has not finished loading fails assertions that are
+  // perfectly true. Capped rather than compensated for with longer waits.
+  workers: 2,
   forbidOnly: !!process.env["CI"],
   retries: process.env["CI"] ? 2 : 0,
   reporter: process.env["CI"] ? [["github"], ["html", { open: "never" }]] : [["list"]],

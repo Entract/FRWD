@@ -27,6 +27,7 @@ import {
   replaceNode,
   takeChildren,
 } from "./tree.js";
+import { isThemeEditFailure, setThemeToken } from "./theme.js";
 import type {
   ApplyOptions,
   CommitResult,
@@ -34,6 +35,7 @@ import type {
   Operation,
   OperationEnvelope,
   PreparedTransaction,
+  SetThemeTokenOperation,
   TransactionChange,
   TransactionResult,
 } from "./types.js";
@@ -309,7 +311,8 @@ function validateEnvelope(document: FrwdDocument, envelope: OperationEnvelope): 
 
 function checkConstraints(operation: Operation, constraints: Constraints, index: number): Diagnostic[] {
   const presentational =
-    operation.op === "set_attribute" && PRESENTATIONAL_ATTRIBUTES.has(operation.name.toLowerCase());
+    operation.op === "set_theme_token" ||
+    (operation.op === "set_attribute" && PRESENTATIONAL_ATTRIBUTES.has(operation.name.toLowerCase()));
 
   if (constraints.contentLocked === true && !presentational) {
     return [
@@ -346,6 +349,8 @@ function applyOperation(
   index: number,
   options: ApplyOptions,
 ): Outcome {
+  if (operation.op === "set_theme_token") return applyThemeToken(staged, operation, index);
+
   const target = resolveTarget(root, operation.target, index, operation.op);
   if ("error" in target) return { error: target.error };
   const element = target.element;
@@ -511,6 +516,50 @@ function applyOperation(
       };
     }
   }
+}
+
+/**
+ * Change a theme token in the document stylesheet.
+ *
+ * Addressed by token name and scope rather than by a stable id, because the
+ * thing being edited is the document's own design rather than one of its
+ * objects. Everything else about the transaction is unchanged: it happens on
+ * the staged copy, and the result still has to clear the CSS safety profile
+ * before it can commit.
+ */
+function applyThemeToken(staged: FrwdDocument, operation: SetThemeTokenOperation, index: number): Outcome {
+  const css = staged.css;
+  if (css === undefined) {
+    return {
+      error: {
+        severity: "error",
+        code: "missing-document-stylesheet",
+        message: `Operation ${index} sets a theme token, but the document has no <style id="frwd-document-style">.`,
+      },
+    };
+  }
+
+  const scope = operation.scope ?? "default";
+  const result = setThemeToken(css, operation.name, operation.value, scope);
+  if (isThemeEditFailure(result)) {
+    return { error: { severity: "error", code: result.code, message: `Operation ${index}: ${result.message}` } };
+  }
+
+  staged.css = result.css;
+
+  const detail = result.createdRule
+    ? `added a ${scope} :root rule to hold it`
+    : result.replaced
+      ? "replaced the previous value"
+      : "added it to the existing rule";
+
+  return {
+    change: {
+      op: operation.op,
+      target: operation.name,
+      summary: `Set ${operation.name} to ${operation.value} in the ${scope} theme; ${detail}.`,
+    },
+  };
 }
 
 function resolveTarget(

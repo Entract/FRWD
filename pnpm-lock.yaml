@@ -53,6 +53,9 @@ importers:
       '@frwd/sanitize':
         specifier: workspace:*
         version: link:../sanitize
+      postcss:
+        specifier: ^8.5.26
+        version: 8.5.26
 
   packages/publisher:
     dependencies:

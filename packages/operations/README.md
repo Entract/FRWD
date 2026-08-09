@@ -98,10 +98,32 @@ attribute; it is what every other operation addresses.
 | `delete_node` | Remove the target. Not the document root. |
 | `move_node` | Relocate a node, keeping its identity. Not inside itself. |
 | `set_attribute` | Set or remove one attribute. |
+| `set_theme_token` | Set a CSS custom property in the document stylesheet. |
 
-Style and theme operations — `set_theme_token`, layout and figure variants,
-stylesheet regions — are deliberately absent. They arrive in `t-016`, on top of
-this transaction machinery rather than beside it.
+### `set_theme_token`, and what is deliberately not here
+
+```json
+{ "op": "set_theme_token", "name": "--accent", "value": "#2458a6", "scope": "default" }
+```
+
+`scope` is `default` or `dark`, and is explicit. Designed documents pair a light
+value with a `prefers-color-scheme: dark` counterpart under the same token name,
+so an operation that picked one by position would silently change the wrong half
+of a theme.
+
+The stylesheet is edited through a CSS syntax tree, never string replacement,
+and the result must still clear the CSS safety profile — a token value cannot
+smuggle a remote reference into the document. Ambiguity is refused rather than
+resolved: two `:root` rules in one scope declaring the same token means source
+order decides the winner, and guessing which was meant is not this package's job.
+
+It is the **only** style operation, on purpose. FRWD provides safe mechanisms for
+changing document-owned design; it does not standardise the design vocabulary of
+individual documents. `wide` and `main-sidebar` are classes our fixtures happen
+to define, not format concepts, and `set_attribute` on `class` already reaches
+them. A high-level `set_figure_variant()` belongs in an editor that can read
+which variants a given document actually defines, and compiles to
+`set_attribute`.
 
 ### `replace_text` is deliberately blunt
 
@@ -127,4 +149,4 @@ children parse inside the target, siblings inside its parent.
 `style`); everything else is refused. `styleLocked` is the mirror. Both are
 checked before anything is staged.
 
-Implemented in task `t-005`.
+Implemented in task `t-005`; `set_theme_token` in `t-016`.

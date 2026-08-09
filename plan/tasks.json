@@ -274,9 +274,9 @@
     },
     {
       "id": "t-016",
-      "title": "Style and theme operations",
-      "description": "The design half of the AI editing protocol, deliberately split from t-005 so the structural core lands first. Covers set_theme_token, set_layout_variant, set_figure_variant and replace-stylesheet-region, all subject to CSS sanitization, plus the style-lock constraint applied to real CSS mutation rather than only to class and style attributes. Depends on t-005 for the transaction machinery: staging, atomicity, revision handling and composed conformance are already settled there and must not be reimplemented.",
-      "status": "pending",
+      "title": "set_theme_token: a safe mechanism for document-owned design",
+      "description": "Narrower than the speculative API in the design document. FRWD provides safe mechanisms for changing document-owned design; it does not standardise the design vocabulary of individual documents, so class names our reference fixtures happen to use do not become format concepts. set_theme_token is the one genuinely new style operation in v0.1: it edits a CSS custom property in style#frwd-document-style through a real CSS AST rather than string replacement, runs through the existing staged atomic transaction machinery, stays subject to the native CSS safety profile, fails rather than guessing when the target scope is ambiguous, is rejected by styleLocked and permitted by contentLocked, and appears in the change record. Scope is explicit - default or dark - because the real documents all pair a light value with a prefers-color-scheme dark counterpart, and textual surgery cannot tell them apart. Figure and layout variants are deliberately NOT enumerated at FRWD level: set_attribute on class is already the mechanism, and a future editor tool can inspect which variants a document defines and compile to that. set_print_target_pages and stylesheet-region replacement stay deferred - page-count targeting is an optimisation goal, not a deterministic operation. Also update the protocol document to separate core operations, document-defined style classes, and high-level agent tools that compile to operations.",
+      "status": "in-progress",
       "dependsOn": [
         "t-005"
       ],
@@ -356,7 +356,7 @@
       "id": "t-021",
       "title": "Scientific reference document",
       "description": "The next designed document after the rich manual: MathML equations as the canonical representation, numbered figures and tables, cross-references, and a references section. Same rules - no document-type-specific format features, only HTML, CSS and existing FRWD primitives, structural and safety conformance, and cross-browser coverage. MathML is the one area likely to expose a genuine gap: if the existing model cannot express something essential, stop and record why before adding a primitive.",
-      "status": "in-progress",
+      "status": "done",
       "dependsOn": [],
       "assignee": "claude",
       "category": "feature",
@@ -364,7 +364,8 @@
         "fixtures"
       ],
       "canParallelize": true,
-      "planDoc": "13_EXAMPLE_DOCUMENTS.md"
+      "planDoc": "13_EXAMPLE_DOCUMENTS.md",
+      "completedCommit": "bf61bb7db8650d853a9018504de9513f9037d029"
     },
     {
       "id": "t-022",

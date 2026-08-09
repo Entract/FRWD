@@ -54,13 +54,40 @@ export interface SetAttributeOperation {
   value?: string | null;
 }
 
+/**
+ * Which half of a theme a token belongs to.
+ *
+ * Explicit, never inferred. Every designed FRWD so far declares a light value
+ * and a prefers-color-scheme dark counterpart under the same token name, so an
+ * operation that guessed would silently change the wrong one.
+ */
+export type ThemeScope = "default" | "dark";
+
+/**
+ * Change a CSS custom property in the document stylesheet.
+ *
+ * The one style operation in v0.1, and deliberately the only one: FRWD gives
+ * safe mechanisms for changing document-owned design, it does not standardise
+ * the design vocabulary of individual documents. A class a theme happens to
+ * define is that document's business, and set_attribute already reaches it.
+ */
+export interface SetThemeTokenOperation {
+  op: "set_theme_token";
+  /** Custom property name, including the leading double hyphen. */
+  name: string;
+  value: string;
+  /** Defaults to "default". */
+  scope?: ThemeScope;
+}
+
 export type Operation =
   | ReplaceTextOperation
   | ReplaceNodeOperation
   | InsertOperation
   | DeleteNodeOperation
   | MoveNodeOperation
-  | SetAttributeOperation;
+  | SetAttributeOperation
+  | SetThemeTokenOperation;
 
 export interface Constraints {
   /** Reject anything that changes what the document says. */
@@ -83,6 +110,7 @@ export interface OperationEnvelope {
 /** What one operation did, for the human-readable diff. */
 export interface TransactionChange {
   op: Operation["op"];
+  /** Stable id the operation addressed, or the token name for a theme change. */
   target: string;
   summary: string;
   /** Stable ids minted for inserted nodes that arrived without one. */
