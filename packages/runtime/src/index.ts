@@ -101,66 +101,8 @@ export function installFrwdRuntime(): void {
     }
   }
 
-  /**
-   * Print expands disclosures, then puts them back.
-   *
-   * A reader holding a printout cannot click anything, so collapsed content
-   * would simply be missing - and a component that silently disappears from
-   * print is exactly what the rich-media contract forbids.
-   */
-  function installPrintHandlers(): void {
-    var reopened: Element[] = [];
-
-    var expand = function (): void {
-      reopened = [];
-      var details = document.querySelectorAll("details");
-      for (var index = 0; index < details.length; index++) {
-        var element = details[index];
-        if (element && !element.hasAttribute("open")) {
-          element.setAttribute("open", "");
-          reopened.push(element);
-        }
-      }
-
-      var disclosures = document.querySelectorAll("frwd-disclosure");
-      for (var index2 = 0; index2 < disclosures.length; index2++) {
-        var disclosure = disclosures[index2];
-        if (!disclosure) continue;
-        var body = disclosure.querySelector("[data-frwd-disclosure-body]");
-        if (body && body.hasAttribute("hidden")) {
-          body.removeAttribute("hidden");
-          reopened.push(body);
-        }
-      }
-    };
-
-    var restore = function (): void {
-      for (var index = 0; index < reopened.length; index++) {
-        var element = reopened[index];
-        if (!element) continue;
-        if (element.tagName.toLowerCase() === "details") element.removeAttribute("open");
-        else element.setAttribute("hidden", "");
-      }
-      reopened = [];
-    };
-
-    if (typeof window.matchMedia === "function") {
-      var query = window.matchMedia("print");
-      if (typeof query.addEventListener === "function") {
-        query.addEventListener("change", function (event) {
-          if ((event as MediaQueryListEvent).matches) expand();
-          else restore();
-        });
-      }
-    }
-
-    window.addEventListener("beforeprint", expand);
-    window.addEventListener("afterprint", restore);
-  }
-
   function start(): void {
     hydrateAll();
-    installPrintHandlers();
     root.setAttribute("data-frwd-runtime", "active");
   }
 
@@ -187,9 +129,28 @@ export const RUNTIME_SOURCE = `/* FRWD runtime ${RUNTIME_VERSION} - Apache-2.0 -
  *
  * Deliberately tiny. The document owns its appearance; this only covers states
  * the runtime itself introduces, and keeps runtime chrome out of print.
+ *
+ * Print expansion lives here rather than in the script above, and that is a
+ * correctness decision rather than a stylistic one. A publication must print
+ * with JavaScript disabled, so collapsed substantive content has to be revealed
+ * by CSS - a `beforeprint` handler would drop it from exactly the printouts
+ * nobody can debug. It also removes any dependence on which engines fire which
+ * print events.
  */
 export const RUNTIME_STYLE = `[data-frwd-disclosure-body][hidden] { display: none; }
+
 @media print {
   [data-frwd-runtime-chrome] { display: none !important; }
+
+  /* Nothing substantive may disappear from a printout, whether or not the
+     runtime ever ran: a reader holding paper cannot expand anything. */
+  [data-frwd-disclosure-body][hidden] { display: block !important; }
+
+  /* Best effort for native <details>, which no CSS can force open in every
+     engine: ::details-content covers Chromium and Firefox, WebKit has no
+     equivalent. Substantive collapsed content therefore belongs in a
+     frwd-disclosure, or in <details open>. */
+  details:not([open])::details-content { content-visibility: visible !important; }
+  details > *:not(summary) { display: block !important; }
 }
 `;

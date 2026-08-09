@@ -1616,6 +1616,15 @@ Example use:
 
 Print defaults to expanded.
 
+**How that is achieved matters.** Print expansion is done in CSS, not in a `beforeprint` handler, because a publication must print correctly with JavaScript disabled — a script-driven expansion would drop content from exactly the printouts nobody can debug.
+
+That constrains which disclosure to reach for. `frwd-disclosure` uses an ordinary `hidden` attribute, which CSS can override in every engine, so its content always prints. A closed native `<details>` cannot be force-expanded by CSS in every engine: `::details-content` covers Chromium and Firefox, WebKit has no equivalent today.
+
+Therefore:
+
+- use `<details>` freely for supplementary content the reader can take or leave;
+- put **substantive** content that must reach paper in a `frwd-disclosure`, or author the `<details>` as `<details open>`.
+
 ## 9. Callout
 
 A callout is semantic supporting content:

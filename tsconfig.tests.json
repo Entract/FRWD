@@ -9,7 +9,10 @@
   "include": [
     "packages/*/test/**/*.ts",
     "packages/*/src/**/*.test.ts",
-    "tests/**/*.ts",
+    "tests/conformance/**/*.ts",
+    "tests/harness/**/*.ts",
+    "tests/roundtrip/**/*.ts",
+    "tests/security/**/*.ts",
     "vitest.config.ts",
     "playwright.config.ts"
   ],

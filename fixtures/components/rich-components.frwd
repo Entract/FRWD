@@ -1,0 +1,71 @@
+<!DOCTYPE html><html data-frwd-version="0.1" lang="en"><head>
+<meta charset="utf-8">
+<meta content="d1000000-0000-4000-8000-000000000001" name="frwd-document-id">
+<title>Rich components</title>
+<script id="frwd-manifest" type="application/frwd+json">
+{
+  "format": "frwd",
+  "version": "0.1",
+  "documentId": "d1000000-0000-4000-8000-000000000001",
+  "title": "Rich components",
+  "created": "2026-08-09T09:00:00Z",
+  "modified": "2026-08-09T09:00:00Z",
+  "language": "en",
+  "description": "Every rich component the 0.1 runtime knows about, each with a fallback that reads correctly when nothing runs."
+}
+</script>
+<script id="quarterly-revenue" type="application/frwd-dataset+json">
+{
+  "columns": ["quarter", "revenue"],
+  "rows": [["Q1", 10], ["Q2", 13]]
+}
+</script>
+<style id="frwd-document-style">
+:root { color-scheme: light dark; --measure: 34rem; }
+body { margin: 0; font: 400 1rem/1.6 ui-serif, Georgia, serif; }
+main { max-width: var(--measure); margin: 3rem auto; padding: 0 1.25rem; }
+frwd-callout { display: block; }
+aside { border-left: 3px solid currentColor; padding-left: 1rem; }
+frwd-disclosure { display: block; margin: 1.5rem 0; }
+[data-frwd-disclosure-toggle] { font: inherit; cursor: pointer; }
+figure { margin: 1.5rem 0; }
+figcaption { font-size: 0.875rem; }
+@media (max-width: 30rem) { main { margin: 1.5rem auto; } }
+</style>
+</head>
+<body>
+<main data-frwd-document="">
+<article data-frwd-id="d1000000-0000-4000-8000-000000000002">
+<h1 data-frwd-id="d1000000-0000-4000-8000-000000000003">Rich components</h1>
+<p data-frwd-id="d1000000-0000-4000-8000-000000000004">Every component below reads correctly with no script running at all. The runtime adds behaviour on top; it never supplies the content.</p>
+
+<frwd-callout data-frwd-id="d1000000-0000-4000-8000-000000000005">
+<aside data-frwd-id="d1000000-0000-4000-8000-000000000006" class="frwd-callout">
+<p data-frwd-id="d1000000-0000-4000-8000-000000000007">A callout is ordinary complementary content, styled. No custom element is required for it to mean something.</p>
+</aside>
+</frwd-callout>
+
+<frwd-disclosure data-frwd-id="d1000000-0000-4000-8000-000000000008" data-frwd-expanded="false">
+<button aria-expanded="false" data-frwd-disclosure-toggle="" type="button">Method notes</button>
+<div data-frwd-id="d1000000-0000-4000-8000-000000000009" data-frwd-disclosure-body="">
+<p data-frwd-id="d1000000-0000-4000-8000-000000000010">Collapsed detail that must still reach a printed page, because a reader holding paper cannot expand anything.</p>
+</div>
+</frwd-disclosure>
+
+<details data-frwd-id="d1000000-0000-4000-8000-000000000011">
+<summary>Native disclosure</summary>
+<p data-frwd-id="d1000000-0000-4000-8000-000000000012">Standard details and summary, used where they already solve the problem.</p>
+</details>
+
+<frwd-chart data-frwd-id="d1000000-0000-4000-8000-000000000013" data-source="quarterly-revenue" data-type="bar" data-x="quarter" data-y="revenue">
+<figure data-frwd-id="d1000000-0000-4000-8000-000000000014">
+<img alt="Revenue rose from ten in the first quarter to thirteen in the second." height="1" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" width="1">
+<figcaption data-frwd-id="d1000000-0000-4000-8000-000000000015">Quarterly revenue. The static figure is the baseline; the runtime may hydrate it later.</figcaption>
+</figure>
+</frwd-chart>
+
+<p data-frwd-id="d1000000-0000-4000-8000-000000000016">Ordinary prose continues after the components, and reflows around them.</p>
+</article>
+</main>
+
+</body></html>

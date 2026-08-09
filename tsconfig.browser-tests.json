@@ -1,0 +1,12 @@
+{
+  "//": "Playwright specs run in Node but their page.evaluate bodies are DOM code, so they need the DOM lib. Kept separate from tsconfig.tests.json so a Vitest suite cannot reach for a browser global and still typecheck.",
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "outDir": ".tsbuild/browser-tests",
+    "lib": ["ES2023", "DOM"],
+    "types": ["node"]
+  },
+  "include": ["tests/browser/**/*.ts"],
+  "references": [{ "path": "./packages/format" }, { "path": "./packages/publisher" }]
+}

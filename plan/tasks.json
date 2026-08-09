@@ -99,7 +99,8 @@
       "id": "t-006",
       "title": "packages/publisher + packages/runtime - .frwd.html emission",
       "description": "Publisher that emits report.frwd.html from a .frwd document, embedding the trusted standard FRWD browser runtime (edit mode hooks, safe rich interactivity, Save As, print/export helpers). The runtime is framework-agnostic and self-contained; the published file must be a single portable HTML file that works fully offline and remains readable with JavaScript disabled.",
-      "status": "in-progress",
+      "status": "done",
+      "completedCommit": "7e249ce9f62f80ce711480b1b72c8bebd8c19e5d",
       "dependsOn": [
         "t-005"
       ],
@@ -116,7 +117,7 @@
       "id": "t-007",
       "title": "Cross-browser Playwright suite for .frwd.html",
       "description": "Exercise publisher output against Chromium, Firefox and WebKit as soon as the publisher exists - not after the editor. Covers: offline load from file:// with no network, JavaScript-disabled readability, media playback, print stylesheet rendering, and Save As round-trip back through packages/format. Wired into CI.",
-      "status": "pending",
+      "status": "in-progress",
       "dependsOn": [
         "t-006"
       ],
@@ -302,6 +303,21 @@
       "canParallelize": false,
       "planDoc": "06_AI_NATIVE_EDITING_PROTOCOL.md"
     }
+    {
+      "id": "t-018",
+      "title": "Conformance rule: substantive content must not be trapped in a closed native details",
+      "description": "The cross-browser suite established that no CSS can force-expand a closed native <details> in every engine - ::details-content covers Chromium and Firefox, WebKit has no equivalent - so substantive content inside one can silently vanish from a printout. That breaks the rich-media print contract, which says no component carrying substantive content may disappear from print. Add a checkable rule rather than leaving it as guidance: report a diagnostic when a <details> without open contains substantive content, and point the author at frwd-disclosure or <details open>. Decide which layer owns it - it is a print-contract rule rather than a safety-profile one, so it probably belongs in packages/format's structural validation. Needs a fixture and, once it exists, the WebKit skip in the browser suite can be replaced by a rule that makes the situation unreachable.",
+      "status": "pending",
+      "dependsOn": [],
+      "assignee": "claude",
+      "category": "feature",
+      "affectedPaths": [
+        "packages/format",
+        "fixtures"
+      ],
+      "canParallelize": true,
+      "planDoc": "05_RICH_MEDIA_AND_INTERACTIVITY.md"
+    }
   ],
-  "nextId": 18
+  "nextId": 19
 }

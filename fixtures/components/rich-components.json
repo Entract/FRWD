@@ -1,0 +1,9 @@
+{
+  "title": "Rich components",
+  "description": "Every rich component the 0.1 runtime knows about - callout, disclosure, native details, chart with static fallback, and an inert dataset - each written so it reads correctly when nothing runs.",
+  "conforming": true,
+  "canonical": true,
+  "expectedDiagnostics": [],
+  "profileConforming": true,
+  "expectedProfileDiagnostics": []
+}

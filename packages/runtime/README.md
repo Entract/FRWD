@@ -37,10 +37,13 @@ identifier. The "no dependencies" rule is structural rather than aspirational.
   the rest are marked `static`, because their fallback content *is* the
   component until a later runtime has something better. Unknown `frwd-*`
   elements are preserved and left alone, per spec §17.
-- **Print.** Expands `<details>` and collapsed disclosures before printing and
-  restores them after. A reader holding a printout cannot click anything, and a
-  component that silently vanishes from print is exactly what the rich-media
-  contract forbids.
+- **Print.** Collapsed disclosures are expanded by the runtime *stylesheet*, not
+  by a `beforeprint` handler. A publication must print correctly with JavaScript
+  disabled, and a script-driven expansion would drop content from exactly the
+  printouts nobody can debug. Native `<details>` gets a best-effort rule:
+  `::details-content` covers Chromium and Firefox, WebKit has no equivalent, so
+  substantive collapsed content belongs in a `frwd-disclosure` or a
+  `<details open>`.
 - **State marker.** Sets `data-frwd-runtime="active"` on `<html>` once installed.
 
 **Editing is deliberately absent.** Edit mode, undo and Save As belong with the
