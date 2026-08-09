@@ -104,12 +104,18 @@ export function inspectCss(css: string, options: { inlineDeclarations?: boolean 
 }
 
 /**
- * Remove remote references from a stylesheet.
+ * Remove remote references from a stylesheet, returning only CSS we can vouch
+ * for.
  *
  * `@import` rules are dropped entirely. A declaration whose value reaches
  * outside the file is dropped too, rather than having the URL blanked: a
  * `background-image` pointing nowhere is a broken rule, and leaving broken
  * rules behind makes it harder to see what the document actually does.
+ *
+ * CSS that will not parse comes back empty. Losing a stylesheet is a real cost,
+ * but the alternative is returning bytes we were unable to check while
+ * reporting the document as sanitized - and that is the one thing a sanitizer
+ * must never do.
  */
 export function stripRemoteCss(css: string, options: { inlineDeclarations?: boolean } = {}): {
   css: string;
@@ -117,7 +123,7 @@ export function stripRemoteCss(css: string, options: { inlineDeclarations?: bool
 } {
   const inline = options.inlineDeclarations === true;
   const root = parseCss(inline ? `*{${css}}` : css);
-  if (!root) return { css, removed: [{ kind: "parse-error", value: css.slice(0, 80), context: "stylesheet" }] };
+  if (!root) return { css: "", removed: [{ kind: "parse-error", value: css.slice(0, 80), context: "stylesheet" }] };
 
   const removed: CssFinding[] = [];
 

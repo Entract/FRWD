@@ -64,7 +64,8 @@
       "id": "t-004",
       "title": "packages/sanitize - enforce the native no-script profile",
       "description": "Framework-agnostic sanitizer enforcing the native .frwd profile: no arbitrary executable JavaScript, no event-handler attributes, no external script or unsafe URL schemes, allow-list of elements/attributes/CSS consistent with the security document. Includes security test fixtures for known injection vectors. Must be usable both on import (untrusted document) and on export. Inspection and mutation stay strictly separate, matching the format package's reading-never-mutates principle: inspect() reports profile violations over an untrusted document without changing a byte of it, and sanitize() is an explicit, separately invoked repair that reports every change it makes. An unsafe file must be parseable as inert data and describable, never silently edited. Sanitize emits Diagnostic values in the same shape packages/format uses, and this task must also introduce the composed conformance result: a structurally valid FRWD that contains arbitrary executable script is NOT a conforming native FRWD, so the public answer to 'is this a conforming native document?' has to combine the structural layer and the safety profile rather than either alone.",
-      "status": "in-progress",
+      "status": "done",
+      "completedCommit": "71375577bfa2f018d84753ffdc2683985d155858",
       "dependsOn": [
         "t-003"
       ],
@@ -249,6 +250,39 @@
       "canParallelize": false,
       "planDoc": "02_FRWD_FORMAT_SPEC_V0_1.md"
     }
+    {
+      "id": "t-015",
+      "title": "Harden the native safety profile: dataset type, fail-closed CSS, form/link surfaces",
+      "description": "Three corrections to the profile. First, accept application/frwd-dataset+json as inert FRWD data - the rich-media spec section 7 defines datasets with that type, so the sanitizer currently rejects a construct FRWD 0.1 requires. Second, make css-parse-error an error rather than a warning: if the security layer cannot parse the CSS it cannot establish that the CSS makes no external requests, and the native profile must fail closed. Third, close user-triggered and network surfaces that native 0.1 gains nothing from: forbid <form> (forms are deferred and need an explicit future design and security model), forbid <link> (FRWD already owns its stylesheet in style#frwd-document-style, so an element that can pull in an uninspected stylesheet is pure attack surface), and reject the formaction and ping attributes. Add a focused regression fixture for each, plus a positive fixture proving an inert dataset block is accepted.",
+      "status": "in-progress",
+      "dependsOn": [],
+      "assignee": "claude",
+      "category": "feature",
+      "affectedPaths": [
+        "packages/sanitize/src/rules.ts",
+        "packages/sanitize/src/inspect.ts",
+        "packages/sanitize/src/sanitize.ts",
+        "fixtures/security"
+      ],
+      "canParallelize": false,
+      "planDoc": "09_SECURITY_TRUST_AND_PORTABILITY.md"
+    },
+    {
+      "id": "t-016",
+      "title": "Style and theme operations",
+      "description": "The design half of the AI editing protocol, deliberately split from t-005 so the structural core lands first. Covers set_theme_token, set_layout_variant, set_figure_variant and replace-stylesheet-region, all subject to CSS sanitization, plus the style-lock constraint applied to real CSS mutation rather than only to class and style attributes. Depends on t-005 for the transaction machinery: staging, atomicity, revision handling and composed conformance are already settled there and must not be reimplemented.",
+      "status": "pending",
+      "dependsOn": [
+        "t-005"
+      ],
+      "assignee": "claude",
+      "category": "feature",
+      "affectedPaths": [
+        "packages/operations"
+      ],
+      "canParallelize": false,
+      "planDoc": "06_AI_NATIVE_EDITING_PROTOCOL.md"
+    }
   ],
-  "nextId": 15
+  "nextId": 17
 }

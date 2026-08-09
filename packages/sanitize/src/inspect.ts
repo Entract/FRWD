@@ -3,6 +3,7 @@ import { inspectCss } from "./css.js";
 import {
   DEFAULT_MAX_DATA_URL_BYTES,
   FETCHING_ATTRIBUTES,
+  FORBIDDEN_ATTRIBUTES,
   FORBIDDEN_ELEMENTS,
   INERT_SCRIPT_TYPES,
   KNOWN_CUSTOM_ELEMENTS,
@@ -136,6 +137,18 @@ function inspectAttributes(element: Element, report: Report, maxDataUrlBytes: nu
       continue;
     }
 
+    if (FORBIDDEN_ATTRIBUTES.has(name.toLowerCase())) {
+      report(
+        {
+          severity: "error",
+          code: "forbidden-attribute",
+          message: `${name} on <${tagName}> is not permitted in a native FRWD: it submits or reports to a URL without the user knowing.`,
+        },
+        element,
+      );
+      continue;
+    }
+
     if (name === "style") {
       for (const finding of inspectCss(value, { inlineDeclarations: true })) {
         report(cssDiagnostic(finding, `style attribute on <${tagName}>`), element);
@@ -226,10 +239,13 @@ function cssDiagnostic(
   where: string,
 ): Omit<Diagnostic, "elementId"> {
   if (finding.kind === "parse-error") {
+    // Fail closed. CSS we cannot parse is CSS we cannot clear of making
+    // external requests, and "we did not manage to check this" is not a
+    // reason to call a document safe.
     return {
-      severity: "warning",
+      severity: "error",
       code: "css-parse-error",
-      message: `CSS in ${where} could not be parsed, so it could not be checked.`,
+      message: `CSS in ${where} could not be parsed, so it cannot be shown to make no external requests.`,
     };
   }
 

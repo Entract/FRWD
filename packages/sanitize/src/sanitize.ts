@@ -13,6 +13,7 @@ import {
 import { stripRemoteCss } from "./css.js";
 import {
   FETCHING_ATTRIBUTES,
+  FORBIDDEN_ATTRIBUTES,
   FORBIDDEN_ELEMENTS,
   INERT_SCRIPT_TYPES,
   NAVIGATIONAL_ATTRIBUTES,
@@ -94,7 +95,12 @@ export function sanitize(root: Node, options: InspectOptions = {}): SanitizeRepo
         record(
           {
             action: "rewrote-css",
-            code: finding.kind === "import" ? "css-import" : "css-external-resource",
+            code:
+              finding.kind === "import"
+                ? "css-import"
+                : finding.kind === "parse-error"
+                  ? "css-parse-error"
+                  : "css-external-resource",
             detail: `${finding.context}: ${finding.value}`,
           },
           element,
@@ -125,6 +131,12 @@ function sanitizeAttributes(element: Element, record: Record_): void {
       continue;
     }
 
+    if (FORBIDDEN_ATTRIBUTES.has(name.toLowerCase())) {
+      record({ action: "removed-attribute", code: "forbidden-attribute", detail: `${name} on <${tagName}>` }, element);
+      removeAttr(element, attribute.name);
+      continue;
+    }
+
     if (name === "style") {
       const { css, removed } = stripRemoteCss(value, { inlineDeclarations: true });
       if (removed.length === 0) continue;
@@ -132,7 +144,12 @@ function sanitizeAttributes(element: Element, record: Record_): void {
         record(
           {
             action: "rewrote-css",
-            code: finding.kind === "import" ? "css-import" : "css-external-resource",
+            code:
+              finding.kind === "import"
+                ? "css-import"
+                : finding.kind === "parse-error"
+                  ? "css-parse-error"
+                  : "css-external-resource",
             detail: `style attribute on <${tagName}>: ${finding.value}`,
           },
           element,

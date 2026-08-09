@@ -45,6 +45,16 @@ describe("script elements", () => {
     expect(codes(document)).toEqual([]);
   });
 
+  it("accepts an inert dataset block, which the rich media spec requires", () => {
+    const document = FrwdDocument.parse(
+      build(
+        `<p data-frwd-id="p1">x</p>
+<script id="dataset-1" type="application/frwd-dataset+json">{"columns":["q"],"rows":[["Q1"]]}</script>`,
+      ),
+    );
+    expect(codes(document)).toEqual([]);
+  });
+
   it("rejects any other type, inert or not", () => {
     // text/plain does not execute, but a reader cannot rely on that, and a
     // profile that admits exceptions is a profile nobody can verify.
@@ -149,6 +159,18 @@ describe("CSS", () => {
     expect(inspectCss("a { color: ").map((f) => f.kind)).toEqual(["parse-error"]);
   });
 
+  it("fails closed on unparseable CSS: it is an error, and nothing survives sanitization", () => {
+    // CSS we cannot parse is CSS we cannot clear of making external requests.
+    const document = FrwdDocument.parse(build(`<p data-frwd-id="p1">x</p>`, "", "body { color: red;\n@media screen {"));
+    const diagnostic = inspect(document.tree).find((d) => d.code === "css-parse-error");
+
+    expect(diagnostic?.severity).toBe("error");
+
+    const { css, removed } = stripRemoteCss("body { color: red;\n@media screen {");
+    expect(removed.map((f) => f.kind)).toEqual(["parse-error"]);
+    expect(css).toBe("");
+  });
+
   it("strips remote references and keeps the rest", () => {
     const { css, removed } = stripRemoteCss(
       '@import "x.css";\nbody { color: red; background: url(https://example.invalid/b.png); margin: 0; }',
@@ -158,6 +180,45 @@ describe("CSS", () => {
     expect(css).toContain("margin: 0");
     expect(css).not.toContain("example.invalid");
     expect(css).not.toContain("@import");
+  });
+});
+
+describe("closed surfaces", () => {
+  it("forbids a form, because forms are deferred and unbudgeted for", () => {
+    const document = FrwdDocument.parse(
+      build(`<p data-frwd-id="p1">x</p><form action="/x"><button type="submit">Send</button></form>`),
+    );
+    expect(codes(document)).toContain("forbidden-element");
+  });
+
+  it("forbids a link element, which could load a stylesheet nobody inspected", () => {
+    const document = FrwdDocument.parse(
+      build(`<p data-frwd-id="p1">x</p>`, `<link href="https://example.invalid/t.css" rel="stylesheet">`),
+    );
+    expect(codes(document)).toContain("forbidden-element");
+  });
+
+  it("rejects formaction and ping wherever they appear", () => {
+    const withFormaction = FrwdDocument.parse(
+      build(`<p data-frwd-id="p1"><button formaction="https://example.invalid/x">Send</button></p>`),
+    );
+    expect(codes(withFormaction)).toEqual(["forbidden-attribute"]);
+
+    const withPing = FrwdDocument.parse(
+      build(`<p data-frwd-id="p1"><a href="https://example.invalid/" ping="https://example.invalid/t">x</a></p>`),
+    );
+    expect(codes(withPing)).toEqual(["forbidden-attribute"]);
+  });
+
+  it("removes those attributes when sanitizing, keeping the link itself", () => {
+    const document = FrwdDocument.parse(
+      build(`<p data-frwd-id="p1"><a href="https://example.invalid/" ping="https://example.invalid/t">Read</a></p>`),
+    );
+    const report = sanitize(document.tree);
+
+    expect(report.changes.map((change) => change.code)).toEqual(["forbidden-attribute"]);
+    expect(document.toHtml()).toContain('href="https://example.invalid/"');
+    expect(document.toHtml()).not.toContain("ping=");
   });
 });
 

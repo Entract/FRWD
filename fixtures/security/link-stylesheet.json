@@ -1,0 +1,12 @@
+{
+  "title": "link-stylesheet",
+  "description": "A <link rel=stylesheet>. FRWD owns its stylesheet in style#frwd-document-style, so this is only the ability to load CSS nobody inspected.",
+  "conforming": true,
+  "canonical": true,
+  "expectedDiagnostics": [],
+  "profileConforming": false,
+  "expectedProfileDiagnostics": [
+    "external-resource",
+    "forbidden-element"
+  ]
+}

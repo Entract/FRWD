@@ -1,0 +1,11 @@
+{
+  "title": "formaction-attribute",
+  "description": "A formaction attribute, which submits to a URL of its own choosing.",
+  "conforming": true,
+  "canonical": true,
+  "expectedDiagnostics": [],
+  "profileConforming": false,
+  "expectedProfileDiagnostics": [
+    "forbidden-attribute"
+  ]
+}

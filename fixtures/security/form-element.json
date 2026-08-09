@@ -1,0 +1,11 @@
+{
+  "title": "form-element",
+  "description": "A <form>. Forms are deferred in FRWD 0.1 and need their own design and security model before a document may submit anything anywhere.",
+  "conforming": true,
+  "canonical": true,
+  "expectedDiagnostics": [],
+  "profileConforming": false,
+  "expectedProfileDiagnostics": [
+    "forbidden-element"
+  ]
+}

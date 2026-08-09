@@ -1,0 +1,11 @@
+{
+  "title": "link-ping",
+  "description": "A ping attribute on a link: a background POST to a third party the moment the reader follows an ordinary-looking hyperlink.",
+  "conforming": true,
+  "canonical": true,
+  "expectedDiagnostics": [],
+  "profileConforming": false,
+  "expectedProfileDiagnostics": [
+    "forbidden-attribute"
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "title": "unparseable-css",
+  "description": "CSS the parser cannot read. An error rather than a warning: the profile fails closed, because CSS we cannot parse is CSS we cannot clear of making external requests.",
+  "conforming": true,
+  "canonical": true,
+  "expectedDiagnostics": [],
+  "profileConforming": false,
+  "expectedProfileDiagnostics": [
+    "css-parse-error"
+  ]
+}

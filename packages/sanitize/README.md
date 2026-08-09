@@ -45,25 +45,37 @@ the answer has two halves.
 
 | Code | |
 |---|---|
-| `executable-script` | Any `<script>` whose type is not inert FRWD data — including `text/plain`, because a profile that admits exceptions is one nobody can verify. |
+| `executable-script` | Any `<script>` whose type is not inert FRWD data — including `text/plain`, because a profile that admits exceptions is one nobody can verify. The inert types are `application/frwd+json`, `application/frwd-asset+json` and `application/frwd-dataset+json`. |
 | `script-content-escape` | Inert script content that could close its own element and split the document. |
 | `event-handler-attribute` | `onclick` and every other `on*` attribute. |
-| `forbidden-element` | `iframe`, `object`, `embed`, `applet`, `frame`, `frameset`, `base`. |
+| `forbidden-element` | `iframe`, `object`, `embed`, `applet`, `frame`, `frameset`, `base`, `form`, `link`. |
+| `forbidden-attribute` | `formaction` and `ping` — both reach a URL without the reader knowing. |
 | `meta-refresh` | Navigation with no user action. |
 | `unsafe-url-scheme` | `javascript:`, `vbscript:`, `blob:`, `filesystem:`. |
 | `unsafe-data-url` | A data URL carrying HTML or JavaScript — self-contained, and still a program. |
 | `external-resource` | Any auto-fetching attribute pointing outside the file, remote *or* relative. |
 | `css-import` | `@import`: a remote stylesheet by another name. |
 | `css-external-resource` | `url()` in CSS reaching outside the file — the quietest tracker there is. |
+| `css-parse-error` | CSS that could not be parsed, and therefore could not be cleared of making external requests. |
 | `oversized-data-url` | Warning. An embedded asset above a configurable limit. |
 | `svg-foreign-object` | Warning. HTML inside SVG, where sanitization is easy to get wrong. |
 | `unknown-custom-element` | Warning. Preserved, but no reader can give it behavior. |
-| `css-parse-error` | Warning. CSS that could not be parsed, and therefore could not be checked. |
 
 An ordinary external hyperlink is **permitted**. Following it is a user action —
 that is the whole distinction the profile is built on.
 
-## Two design notes
+`form` and `link` are closed rather than policed. Forms are deferred in FRWD 0.1
+and need their own design and security model; FRWD already owns its stylesheet
+in `<style id="frwd-document-style">`, so a `<link>` adds nothing except the
+ability to pull in CSS nobody inspected.
+
+## Three design notes
+
+**The profile fails closed.** CSS that will not parse is an error, not a
+warning: "we did not manage to check this" is not a reason to call a document
+safe. `stripRemoteCss` returns empty for the same reason — losing a stylesheet
+is a real cost, but returning bytes we could not check while reporting the
+document as sanitized is the one thing a sanitizer must never do.
 
 **URLs are classified by what a browser does unprompted**, not by pattern
 matching on their text. Browsers strip tab, newline and carriage return from

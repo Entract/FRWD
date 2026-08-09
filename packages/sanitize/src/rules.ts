@@ -11,6 +11,9 @@
 export const INERT_SCRIPT_TYPES: ReadonlySet<string> = new Set([
   "application/frwd+json",
   "application/frwd-asset+json",
+  // Rich media spec section 7: datasets are stored as inert data in a script
+  // block. This is data the chart runtime reads, never code it runs.
+  "application/frwd-dataset+json",
 ]);
 
 /**
@@ -27,7 +30,25 @@ export const FORBIDDEN_ELEMENTS: ReadonlySet<string> = new Set([
   "frame",
   "frameset",
   "base",
+  // Forms are deferred (rich media spec section 2) and need their own design
+  // and security model before a document may submit anything anywhere.
+  "form",
+  // FRWD owns its stylesheet in <style id="frwd-document-style">. A <link> adds
+  // nothing except the ability to pull in a stylesheet nobody inspected.
+  "link",
 ]);
+
+/**
+ * Attributes that are never legitimate in a native FRWD, whatever they are
+ * attached to.
+ *
+ * `formaction` submits a form, which the profile forbids outright. `ping` fires
+ * a background POST to an arbitrary URL when a link is followed - a network
+ * beacon wearing a hyperlink's clothing. Both are checked on every element
+ * rather than only where they function, because a rule with exceptions is a
+ * rule that has to be re-derived every time it is read.
+ */
+export const FORBIDDEN_ATTRIBUTES: ReadonlySet<string> = new Set(["formaction", "ping"]);
 
 /**
  * Attributes that make a browser fetch something on its own, with no user

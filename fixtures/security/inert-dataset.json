@@ -1,0 +1,9 @@
+{
+  "title": "inert-dataset",
+  "description": "The positive control: an inert application/frwd-dataset+json block, which the rich media spec requires and the profile must accept.",
+  "conforming": true,
+  "canonical": true,
+  "expectedDiagnostics": [],
+  "profileConforming": true,
+  "expectedProfileDiagnostics": []
+}
