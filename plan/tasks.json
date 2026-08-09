@@ -21,10 +21,10 @@
     {
       "id": "t-010",
       "title": "apps/editor - minimal flowing edit surface",
-      "description": "Deliberately last. Choose the structured editing layer and UI framework only at this point, informed by what the format and operations work has taught us, and record the choice as an ADR. Vite is the build tool. Minimal scope: open a .frwd file, edit ordinary text naturally, insert a paragraph with correct reflow, move a media block, apply a restyle operation, export .frwd.html.",
+      "description": "The MVP editor slice, after the t-024 ADR settles the architecture. Modest on purpose: open a real .frwd, render with its own document CSS, directly edit ordinary text, basic inline bold/italic/link, insert a paragraph, preserve and mint stable ids correctly, select and move one semantic block such as a figure, change a theme token, undo and redo, save .frwd, publish .frwd.html. No AI panel - t-023 already defines the seam it plugs into later.",
       "status": "pending",
       "dependsOn": [
-        "t-006"
+        "t-024"
       ],
       "assignee": "claude",
       "category": "feature",
@@ -52,7 +52,7 @@
       "id": "t-023",
       "title": "Agent integration boundary and editor architecture reconciliation",
       "description": "Documentation only. Records the durable AI architecture now that the operations write surface is complete enough to describe it without speculation: AI reads through FRWD document tools and writes through FRWD Ops, and the model or agent host is replaceable and not part of the document format. Adds a section to 06_AI_NATIVE_EDITING_PROTOCOL.md covering that AI is external to the document (a .frwd carries no credentials, keys, chat history, agent state, model configuration or required AI runtime), the preferred write path through preview and prepared commit, the agent-facing read surface including render_document as an agent capability rather than a format requirement, that whole-document generation stays valid for initial creation but must clear the same parser, structural validation and safety profile, and that agent hosts - built-in AI, MCP, CLI or SDK, external coding agents, local models, enterprise hosts - are adapters and none of them is normative. Also reconciles 07_EDITOR_ARCHITECTURE.md with decisions since made: the load pipeline inspects rather than sanitizes, so opening an unsafe document never silently mutates it; stable ids are preserved throughout editing rather than restored on save; and React and a ProseMirror or Tiptap class engine are candidates rather than recommendations, with the choice left to the t-023 successor ADR in t-010. Does not choose or implement MCP, PTY integration, model APIs or the AI panel.",
-      "status": "in-progress",
+      "status": "done",
       "dependsOn": [],
       "assignee": "claude",
       "category": "feature",
@@ -62,8 +62,25 @@
         "plan/docs/FRWD_MASTER_DESIGN_SPEC.md"
       ],
       "canParallelize": false,
-      "planDoc": "06_AI_NATIVE_EDITING_PROTOCOL.md"
+      "planDoc": "06_AI_NATIVE_EDITING_PROTOCOL.md",
+      "completedCommit": "f7712055c553acb3a535019042e90cfd2715bab3"
+    },
+    {
+      "id": "t-024",
+      "title": "Editor architecture spike and ADR: who owns the FRWD document model",
+      "description": "Answer one question with evidence before any editor is built: does the structured editing engine own the whole FRWD document model, or does it edit rich-text regions while the validated FRWD DOM stays authoritative? FRWD canonical form is semantic HTML; ProseMirror deliberately uses its own schema-constrained representation and Tiptap documents warn that non-conforming HTML can be lost. FRWD carries arbitrary section structure, stable ids, inline and display MathML, SVG, tables, frwd-* custom elements, inert dataset blocks, document-defined classes and attributes, and embedded media - so the distinction is real rather than theoretical. Run an adversarial round-trip spike using the business report, rich manual and scientific paper: parse into a structured-editor document model and serialize back with no edit, then measure what survives. Record the result as an ADR covering approach A (whole-document structured model) versus approach B (FRWD-DOM-native with structured rich-text regions), and how human fine-grained editing transactions meet FRWD semantic transactions without creating two durable document models.",
+      "status": "in-progress",
+      "dependsOn": [],
+      "assignee": "claude",
+      "category": "feature",
+      "affectedPaths": [
+        "plan/docs/adr",
+        "spikes",
+        "tests/browser"
+      ],
+      "canParallelize": false,
+      "planDoc": "07_EDITOR_ARCHITECTURE.md"
     }
   ],
-  "nextId": 24
+  "nextId": 25
 }

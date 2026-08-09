@@ -32,30 +32,37 @@ Settled, because the rest of the implementation already uses it:
 - DOM/CSS-native rendering;
 - Playwright tests.
 
-**Candidates, not decisions:**
+**Settled by [ADR 0001](adr/0001-frwd-dom-is-authoritative.md):** the validated FRWD DOM is the authoritative in-memory document. A structured editing engine is used for rich text within one block at a time, and its model is transient. It does not own the document.
 
-- React, or another UI framework, or none;
-- a ProseMirror/Tiptap-class structured rich-text engine, or another structured editing layer.
+A spike measured what a whole-document editor model costs: opening the three designed reference documents in ProseMirror with a generous schema and serializing straight back, with no edit, discarded every stable id (54, 51 and 34 respectively), every document class, every `data-*` attribute, and every semantic element except `<img>` - silently, with no error raised.
 
-The editing-layer and UI-framework choice was deliberately deferred so it could be made by an editor that has to work rather than by a document written before one existed. It belongs to the ADR that opens the editor work, and should be argued from what the format, operations and publisher packages actually turned out to need.
+**Still a candidate, not a decision:**
+
+- which engine edits a rich-text region - ProseMirror scoped to a block, a smaller library, or `contenteditable` with careful input handling, since the region schema is narrow;
+- React, another UI framework, or none.
+
+Both are now small, reversible choices rather than architectural ones, which is what deferring them bought.
 
 The saved format MUST NOT depend on any editor library's JSON schema. That is what makes the choice reversible, and it is the reason deferring it costs nothing.
 
-## 3. Why a structured editor engine
+## 3. What the structured engine is for
 
-Raw `contenteditable` alone is insufficient for robust:
+Raw `contenteditable` alone is unreliable for caret behaviour, selection, inline marks, paste normalisation and input-method handling. Those are the problems a structured engine solves well, and they are all *inside* a block.
 
-- selection;
-- schema enforcement;
-- tables;
-- lists;
-- undo;
-- paste normalization;
-- block operations;
-- collaborative-style transactions;
-- stable serialization.
+So the engine handles rich text within one block: paragraph, heading, caption, list-item and cell content.
 
-Use browser editing primitives through a mature structured layer.
+Everything else is FRWD's own machinery, per ADR 0001:
+
+| | Owned by |
+|---|---|
+| Caret, selection, inline marks, typing, paste inside a block | Structured engine, transient region model |
+| Block creation, deletion, movement, replacement | FRWD Ops on the FRWD DOM |
+| Attributes, classes, theme tokens | FRWD Ops |
+| Tables, figures, MathML, SVG, media, custom elements | FRWD DOM objects, addressed by stable id |
+| Serialization | `@frwd/format` |
+| Undo | One editor stack holding both kinds of entry |
+
+This is a smaller job for the engine than the conventional architecture gives it, and deliberately so: it keeps the engine's schema to inline content plus opaque atoms, which is a set that does not grow every time FRWD gains an element.
 
 ## 4. Load pipeline
 

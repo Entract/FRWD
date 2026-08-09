@@ -35,6 +35,10 @@
     "@playwright/test": "^1.62.1",
     "@types/node": "^24.13.3",
     "@vitest/coverage-v8": "^4.1.10",
+    "esbuild": "^0.28.2",
+    "prosemirror-model": "^1.25.11",
+    "prosemirror-schema-basic": "^1.2.4",
+    "prosemirror-schema-list": "^1.5.1",
     "typescript": "^5.9.3",
     "vitest": "^4.1.10"
   }
