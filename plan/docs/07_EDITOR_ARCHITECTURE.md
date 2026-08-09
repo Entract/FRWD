@@ -23,18 +23,23 @@ Core surface:
 └─────────────┴─────────────────────────────┴────────────┘
 ```
 
-## 2. Recommended technical stack
+## 2. Technical stack
 
-Reference implementation:
+Settled, because the rest of the implementation already uses it:
 
 - TypeScript;
-- React;
-- Vite or equivalent;
-- ProseMirror/Tiptap-class structured rich-text engine;
+- Vite;
 - DOM/CSS-native rendering;
 - Playwright tests.
 
-The saved format MUST NOT depend on any editor library's JSON schema.
+**Candidates, not decisions:**
+
+- React, or another UI framework, or none;
+- a ProseMirror/Tiptap-class structured rich-text engine, or another structured editing layer.
+
+The editing-layer and UI-framework choice was deliberately deferred so it could be made by an editor that has to work rather than by a document written before one existed. It belongs to the ADR that opens the editor work, and should be argued from what the format, operations and publisher packages actually turned out to need.
+
+The saved format MUST NOT depend on any editor library's JSON schema. That is what makes the choice reversible, and it is the reason deferring it costs nothing.
 
 ## 3. Why a structured editor engine
 
@@ -59,31 +64,32 @@ Choose/open .frwd
       ↓
 Read as text
       ↓
-Parse HTML without executing it
+Parse without executing it
       ↓
-Validate FRWD metadata
+Structural validation
       ↓
-Sanitize HTML/CSS
+Native safety inspection
       ↓
-Extract document style/assets
-      ↓
-Parse <main data-frwd-document>
-      ↓
-Map to transient editor model
-      ↓
+   ┌──┴──────────────────────────────┐
+ safe                             unsafe
+   ↓                                 ↓
+Extract style/assets          diagnostics, and either
+   ↓                          quarantine or read-only,
+Map to transient editor model with explicit repair only
+   ↓                          if the user asks for it
 Render
 ```
 
-Never inject untrusted source into a live page before sanitization.
+**Inspection, not sanitization.** Opening a document must never silently mutate it. An unsafe file is still someone's file: the editor's job on open is to say what is wrong with it, not to quietly delete the parts it dislikes and present the result as though that were what arrived. Repair is a separate, explicit action the user takes, and it reports what it changed.
+
+Never inject untrusted source into a live page before it has passed inspection.
 
 ## 5. Save pipeline
 
 ```text
-Editor model
+Editor model  (stable ids carried throughout)
       ↓
 Serialize semantic HTML
-      ↓
-Restore stable FRWD IDs
       ↓
 Normalize assets
       ↓
@@ -95,6 +101,8 @@ Validate
       ↓
 Write one .frwd text file
 ```
+
+**Stable ids are preserved throughout editing, not restored on save.** Identity must never leave the transient editor model and be reconstructed afterwards: reconstruction is guesswork, and an id that is guessed is not stable. New ids are minted only for newly created independently editable objects.
 
 ## 6. File access tiers
 
@@ -240,6 +248,8 @@ Possible surfaces:
 - print constraint assistant.
 
 Do not make chat the only interface.
+
+Whatever the surface, the editor's AI writes through the same path as any other agent: inspection, an operation envelope, a prepared transaction, review, commit. It does not reach into the live DOM and it does not regenerate the file. See section 1a of the AI-native editing protocol — that boundary is what lets the editor gain built-in AI without becoming dependent on a particular model, and lets an external agent get exactly the same semantics.
 
 ## 17. MVP editor limitations
 

@@ -10,6 +10,96 @@ AI should modify a FRWD through small, semantic, reviewable changes.
 
 Routine editing MUST NOT require whole-document regeneration.
 
+## 1a. Where AI sits
+
+> **AI reads through FRWD document tools and writes through FRWD Ops. The model or agent host is replaceable and is not part of the document format.**
+
+### AI is external to the document
+
+A `.frwd` contains document content, semantic structure, design, embedded assets and declarative rich behaviour. It does **not** contain:
+
+- model-provider credentials;
+- API keys;
+- chat history;
+- agent runtime state;
+- model configuration;
+- a required AI runtime.
+
+AI is optional. A FRWD must remain fully editable and conforming with no AI involved at any point, and a document that only makes sense to one vendor's model is not a document anyone owns.
+
+### The preferred write path
+
+For an existing document:
+
+```text
+inspect document
+      ↓
+model / tool reasoning
+      ↓
+FRWD operation envelope
+      ↓
+preview / prepared transaction
+      ↓
+human or host review
+      ↓
+commit exact prepared transaction
+```
+
+AI in the reference editor MUST NOT mutate the live DOM directly, and MUST NOT rewrite the whole `.frwd` when a semantic operation can express the change. Whole-file regeneration for a one-paragraph edit is what this protocol exists to avoid: it discards stable identity, it makes review impossible, and it turns every edit into a diff nobody can read.
+
+The commit step is the *exact* prepared transaction, not a re-run of the same request. See sections 6 and 7.
+
+High-level tools such as:
+
+```text
+set_figure_variant(...)
+make_section_more_visual(...)
+redesign_without_changing_text(...)
+```
+
+belong to the agent and editor layer and compile down to core operations. See section 4a.
+
+### Initial creation is different
+
+Generating a whole document from nothing is a valid use of a model — there is no existing structure to preserve, so nothing is lost. A host may offer higher-level creation tools, or simply accept a generated candidate.
+
+What the candidate does not get is a shortcut: it MUST clear the same parser, structural validation and native safety-profile checks as any other input before it becomes an editable FRWD. Once it exists, routine editing switches to semantic incremental operations.
+
+### Agent hosts are adapters
+
+No host is normative. MCP, a PTY, a particular model vendor and a built-in chat panel are all implementation choices, and the specification names none of them as required.
+
+Possible hosts include:
+
+```text
+built-in editor AI
+MCP server
+CLI / SDK
+external coding agents
+local models
+enterprise agent hosts
+```
+
+A PTY may well be how an editor launches an external agent. The conceptual path is still:
+
+```text
+PTY / agent process
+      ↓
+FRWD tool adapter
+      ↓
+FRWD inspection + operations
+```
+
+and not:
+
+```text
+agent → shell → arbitrary text surgery on .frwd
+```
+
+Raw file editing remains *possible* — FRWD is an open text format and that is deliberate — but it is not the reference editor's AI path, and a file edited that way is validated on reopening exactly like any other external input.
+
+The point of the separation is that the editor can gain built-in AI later without becoming model-dependent, and an external agent gets exactly the same document semantics as the editor's own assistant.
+
 ## 2. Stable identity
 
 Every independently editable object has `data-frwd-id`.
@@ -56,7 +146,7 @@ Stale operations must be rejected or explicitly rebased.
 }
 ```
 
-## 5a. Three layers, and why the distinction matters
+## 4a. Three layers, and why the distinction matters
 
 The protocol below is easy to over-extend. Keeping these three apart is what stops FRWD from quietly becoming a design system.
 
@@ -189,7 +279,7 @@ Rules:
 
 ### Replace stylesheet region
 
-Deferred. See section 5a.
+Deferred. See section 4a.
 
 ### Add/replace asset
 
@@ -266,16 +356,19 @@ search_document(query)
 get_style_summary()
 get_theme_tokens()
 get_media_metadata(node_id)
+render_document()
 preview_operations(transaction)
 apply_operations(transaction)
 validate_document()
 ```
 
-Do not send megabytes of embedded video/base64 to the model.
+`render_document()` — rendering the document and looking at it — is genuinely useful for design work, where the question is "does this look right" and no amount of structural inspection answers it. It is an **agent capability, not a format requirement**: a host that cannot render is a less capable host, not a non-conforming one.
+
+Do not send embedded media to the model by default. A base64 video is megabytes of noise to a model and tells it nothing a caption does not. Expose semantic metadata and logical asset identity instead, and let the tool layer resolve or replace actual bytes separately.
 
 ## 11. High-level layout tools
 
-These are tools, not operations - the third layer of section 5a. They live in an editor or an agent, they may be heuristic and document-specific, and they compile down to core operations before anything reaches a document.
+These are tools, not operations - the third layer of section 4a. They live in an editor or an agent, they may be heuristic and document-specific, and they compile down to core operations before anything reaches a document.
 
 ```text
 set_layout_variant(section_id, variant)   -> set_attribute(section_id, "class", ...)

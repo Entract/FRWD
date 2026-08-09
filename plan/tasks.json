@@ -1,154 +1,6 @@
 {
   "tasks": [
     {
-      "id": "t-001",
-      "title": "Bootstrap public FRWD repo (Apache-2.0, workspace, toolchain, CI)",
-      "description": "Wire the existing empty GitHub repo github.com/Entract/FRWD to this working copy and land the project definition as the first commit. Includes: Apache-2.0 LICENSE (canonical text) and NOTICE; strong public README.md; .gitignore (ignoring volatile Alepou machinery under plan/ but tracking plan/docs/); pnpm workspace (pnpm-workspace.yaml + packageManager field); TypeScript base config; Vitest config; Playwright config and browser-test skeleton; GitHub Actions CI running typecheck + unit tests; empty package/app/fixture/test directory scaffold; spec/ and docs/ placeholders with adr/. Also corrects 00_START_HERE.md sections 7-8, which wrongly place the design pack at docs/design/ and ADRs at /docs/adr/ - plan/docs/ is the authoritative home for the design pack.",
-      "status": "done",
-      "completedCommit": "887fff5f9b6b2369185a4a689b2b1f9b09b1975e",
-      "dependsOn": [],
-      "assignee": "claude",
-      "category": "github",
-      "affectedPaths": [
-        "LICENSE",
-        "NOTICE",
-        "README.md",
-        ".gitignore",
-        "package.json",
-        "pnpm-workspace.yaml",
-        "tsconfig.base.json",
-        "vitest.config.ts",
-        "playwright.config.ts",
-        ".github/workflows/ci.yml",
-        "plan/docs/00_START_HERE.md"
-      ],
-      "canParallelize": false,
-      "planDoc": "10_MVP_IMPLEMENTATION_PLAN.md"
-    },
-    {
-      "id": "t-002",
-      "title": "packages/format - parse, serialize and stable object identity",
-      "description": "Framework-agnostic TypeScript package that reads and writes a .frwd document as semantic HTML. Provides: document parse into an in-memory view, stable data-frwd-id assignment and preservation, metadata block read/write, CSS/theme and embedded asset handling, deterministic serialization. Acceptance is semantic round-trip stability: a no-op open/save preserves document identity, all stable ids, semantic structure, content, CSS, metadata and embedded assets. Serialization must be deterministic (same input produces same bytes), but exact original whitespace and attribute formatting are NOT format invariants. No editor or UI framework dependencies.",
-      "status": "done",
-      "completedCommit": "46f39ae9ad7349477118ee257a59f862962bf04d",
-      "dependsOn": [
-        "t-001"
-      ],
-      "assignee": "claude",
-      "category": "feature",
-      "affectedPaths": [
-        "packages/format"
-      ],
-      "canParallelize": false,
-      "planDoc": "02_FRWD_FORMAT_SPEC_V0_1.md"
-    },
-    {
-      "id": "t-003",
-      "title": "fixtures/minimal + conformance harness",
-      "description": "Land the minimal reference fixture and the conformance test harness that runs fixtures against packages/format. The harness must assert semantic round-trip stability and deterministic serialization, and be structured so new fixtures are cheap to add. This lands before sanitize/operations per the design pack instruction to write conformance fixtures early.",
-      "status": "done",
-      "completedCommit": "3dcfd5f543eb5ffea0c0b5cbb5ddb56411f52bac",
-      "dependsOn": [
-        "t-002"
-      ],
-      "assignee": "claude",
-      "category": "feature",
-      "affectedPaths": [
-        "fixtures/minimal",
-        "tests/conformance"
-      ],
-      "canParallelize": false,
-      "planDoc": "11_TEST_AND_CONFORMANCE_PLAN.md"
-    },
-    {
-      "id": "t-004",
-      "title": "packages/sanitize - enforce the native no-script profile",
-      "description": "Framework-agnostic sanitizer enforcing the native .frwd profile: no arbitrary executable JavaScript, no event-handler attributes, no external script or unsafe URL schemes, allow-list of elements/attributes/CSS consistent with the security document. Includes security test fixtures for known injection vectors. Must be usable both on import (untrusted document) and on export. Inspection and mutation stay strictly separate, matching the format package's reading-never-mutates principle: inspect() reports profile violations over an untrusted document without changing a byte of it, and sanitize() is an explicit, separately invoked repair that reports every change it makes. An unsafe file must be parseable as inert data and describable, never silently edited. Sanitize emits Diagnostic values in the same shape packages/format uses, and this task must also introduce the composed conformance result: a structurally valid FRWD that contains arbitrary executable script is NOT a conforming native FRWD, so the public answer to 'is this a conforming native document?' has to combine the structural layer and the safety profile rather than either alone.",
-      "status": "done",
-      "completedCommit": "71375577bfa2f018d84753ffdc2683985d155858",
-      "dependsOn": [
-        "t-003"
-      ],
-      "assignee": "claude",
-      "category": "feature",
-      "affectedPaths": [
-        "packages/sanitize",
-        "tests/security"
-      ],
-      "canParallelize": false,
-      "planDoc": "09_SECURITY_TRUST_AND_PORTABILITY.md"
-    },
-    {
-      "id": "t-005",
-      "title": "packages/operations - deterministic semantic edit operations",
-      "description": "The AI-native editing protocol as deterministic, testable operations over stable document objects: replace_text, replace_node, insert_before, insert_after, append_child, prepend_child, delete_node, move_node and set_attribute, addressed by data-frwd-id. No AI chat UI, no network, no model vendor dependency. Style and theme operations are deliberately deferred to t-016 so the structural core lands first. LOCKED TRANSACTION SEMANTICS: preview is strictly non-mutating; operations apply to a staged copy, never optimistically to the live tree with rollback; a failed transaction changes absolutely nothing; a successful one increments revision exactly once and updates modified exactly once; an absent manifest revision reads as 0; the staged final state must pass both structural and native safety-profile conformance before commit; unsafe generated content is rejected and reported, never silently sanitized; inserted and replacement structural nodes must end with valid unique stable ids, and no ambiguous target may be committed. replace_text is deliberately simple in v0.1: it replaces the target's complete child content with one escaped plain-text node and makes no attempt to preserve strong, links, citations or other inline markup; rich replacement uses replace_node, and range-aware editing is deferred.",
-      "status": "done",
-      "completedCommit": "956d4cd5c6fd570630e959095d39acf37a3d85df",
-      "dependsOn": [
-        "t-004"
-      ],
-      "assignee": "claude",
-      "category": "feature",
-      "affectedPaths": [
-        "packages/operations"
-      ],
-      "canParallelize": false,
-      "planDoc": "06_AI_NATIVE_EDITING_PROTOCOL.md"
-    },
-    {
-      "id": "t-006",
-      "title": "packages/publisher + packages/runtime - .frwd.html emission",
-      "description": "Publisher that emits report.frwd.html from a .frwd document, embedding the trusted standard FRWD browser runtime (edit mode hooks, safe rich interactivity, Save As, print/export helpers). The runtime is framework-agnostic and self-contained; the published file must be a single portable HTML file that works fully offline and remains readable with JavaScript disabled.",
-      "status": "done",
-      "completedCommit": "7e249ce9f62f80ce711480b1b72c8bebd8c19e5d",
-      "dependsOn": [
-        "t-005"
-      ],
-      "assignee": "claude",
-      "category": "feature",
-      "affectedPaths": [
-        "packages/publisher",
-        "packages/runtime"
-      ],
-      "canParallelize": false,
-      "planDoc": "08_BROWSER_PUBLICATION_ARCHITECTURE.md"
-    },
-    {
-      "id": "t-007",
-      "title": "Cross-browser Playwright suite for .frwd.html",
-      "description": "Exercise publisher output against Chromium, Firefox and WebKit as soon as the publisher exists - not after the editor. Covers: offline load from file:// with no network, JavaScript-disabled readability, media playback, print stylesheet rendering, and Save As round-trip back through packages/format. Wired into CI.",
-      "status": "done",
-      "completedCommit": "4da820ea853fc369099195f07b81a3ba0447027a",
-      "dependsOn": [
-        "t-006"
-      ],
-      "assignee": "claude",
-      "category": "feature",
-      "affectedPaths": [
-        "tests/browser",
-        "playwright.config.ts"
-      ],
-      "canParallelize": true,
-      "planDoc": "11_TEST_AND_CONFORMANCE_PLAN.md"
-    },
-    {
-      "id": "t-008",
-      "title": "Flagship designed reference document",
-      "description": "The first serious product demonstration rather than a bigger fixture corpus: one designed reference document where the advantage over a normal AI-generated DOCX is obvious at first glance, while it still behaves as a genuine flowing document. Delivered fixtures/business-report/annual-review.frwd - cover, typographic system, metrics rail, hand-authored SVG chart, financial table, callout and disclosure - built only from HTML, CSS and existing FRWD primitives, with no document-type-specific format features. Browser tests put the thesis itself under test: a substantial semantic edit reflows everything after it with no width changed, the desktop rail stacks sensibly on a phone with nothing lost, and print keeps the whole document while dropping the disclosure control. The remaining designed documents are t-019.",
-      "status": "done",
-      "dependsOn": [
-        "t-006"
-      ],
-      "assignee": "claude",
-      "category": "feature",
-      "affectedPaths": [
-        "fixtures"
-      ],
-      "canParallelize": true,
-      "planDoc": "13_EXAMPLE_DOCUMENTS.md",
-      "completedCommit": "b031ee16058adf16ca3d2327d359387476c29d3d"
-    },
-    {
       "id": "t-009",
       "title": "Public-facing docs: vision, architecture, ADR log, CONTRIBUTING",
       "description": "Write the public renditions that a visitor to the repo needs: docs/vision.md, docs/architecture.md, the first ADRs recording decisions already made (single-HTML source, no ZIP container, no arbitrary script in the native profile, toolchain), and a brief CONTRIBUTING.md. These are condensed public documents derived from the plan/docs/ design pack, not copies of it. Also define the conformance programme that TRADEMARKS.md defers, so that claims of FRWD compatibility have a published, testable standard behind them, and decide whether to promote the normative format spec into spec/FRWD-0.1.md at that point.",
@@ -183,191 +35,6 @@
       "planDoc": "07_EDITOR_ARCHITECTURE.md"
     },
     {
-      "id": "t-011",
-      "title": "Correct copyright holder and split trademark policy into TRADEMARKS.md",
-      "description": "Set the copyright line to 'Copyright 2026 Guy Monroe Entract'. Reduce NOTICE to actual copyright and attribution notices only, and move the FRWD name/logo policy into a dedicated root TRADEMARKS.md stating that Apache-2.0 licenses the code and specification but grants no rights to use the FRWD name or logo in a way implying official status, certification or endorsement, while factual statements that software implements FRWD are permitted. Update the references in README.md and 00_START_HERE.md. Lands before the first push so nothing incorrect is ever published.",
-      "status": "done",
-      "completedCommit": "b025163b3dbb7776a6e10e9aa6c471b2e27fc822",
-      "dependsOn": [],
-      "assignee": "claude",
-      "category": "github",
-      "affectedPaths": [
-        "NOTICE",
-        "TRADEMARKS.md",
-        "README.md",
-        "plan/docs/00_START_HERE.md"
-      ],
-      "canParallelize": false
-    },
-    {
-      "id": "t-012",
-      "title": "Make document conformance reflect the current tree",
-      "description": "FrwdDocument.diagnostics is captured once during parse, so it goes stale as soon as any method mutates the canonical tree - a document parsed with missing ids keeps reporting non-conforming after ensureIds() has fixed them. Replace the snapshot with a validate() method over the current tree and a diagnostics getter that calls it, so validation can never disagree with the document. Also remove the O(n-squared) scan for ids outside the document root, which is what would otherwise make a recomputing getter expensive, and raise missing-stable-id from warning to error: spec section 6 says an editable block MUST carry data-frwd-id, and grading a MUST as a warning was wrong. Regression test: a document with missing ids parses non-conforming, and becomes conforming after ensureIds().",
-      "status": "done",
-      "completedCommit": "dbe133619f2260124e864c0b1e8e863f7bd25700",
-      "dependsOn": [],
-      "assignee": "claude",
-      "category": "feature",
-      "affectedPaths": [
-        "packages/format/src/document.ts",
-        "packages/format/test"
-      ],
-      "canParallelize": false,
-      "planDoc": "02_FRWD_FORMAT_SPEC_V0_1.md"
-    },
-    {
-      "id": "t-013",
-      "title": "Docs language pass: outward-facing README, durable non-goals",
-      "description": "Remove conversational artefacts from the public-facing language without changing the format architecture. Rewrite README.md to be concise and outward-facing: what FRWD is, why it exists, the core architectural idea, status, and how to explore or contribute. Across the design pack, treat concrete document types (reports, CVs, manuals, papers) as examples rather than defining boundaries, and delete negatives that only make sense inside the design conversation - notably 'FRWD is not a CV maker, a presentation format, a web-page builder' and 'the CV is a useful demo, not the product definition'. Keep genuine architectural non-goals: slide or canvas layout, spreadsheet, macro or code execution environment, cloud-dependent workspace. FRWD_MASTER_DESIGN_SPEC.md consolidates the other documents and must be kept in step.",
-      "status": "done",
-      "completedCommit": "0163b4b02c2bfbdf8ec89c491f55bd6f94b128d5",
-      "dependsOn": [],
-      "assignee": "claude",
-      "category": "github",
-      "affectedPaths": [
-        "README.md",
-        "plan/docs/00_START_HERE.md",
-        "plan/docs/01_PRODUCT_VISION.md",
-        "plan/docs/FRWD_MASTER_DESIGN_SPEC.md"
-      ],
-      "canParallelize": true,
-      "planDoc": "01_PRODUCT_VISION.md"
-    },
-    {
-      "id": "t-014",
-      "title": "Normative doctype, and separate conformance from reference serialization",
-      "description": "Two conformance-semantics corrections. First, the HTML5 doctype becomes normative: FRWD depends on predictable standards-mode rendering, so quirks mode is not conforming FRWD even though the content remains recoverable. Raise missing-doctype from warning to error, add the MUST to the format spec, and flip the missing-doctype fixture to non-conforming. Second, stop presenting the reference serializer's byte output as a conformance rule. Deterministic canonical output - attribute ordering, no trailing newline, no reindentation - is REFERENCE CANONICAL SERIALIZATION produced by @frwd/format, not a requirement on FRWD writers. A third-party writer may emit semantically equivalent valid FRWD without matching our bytes. The fixture corpus may require both where canonical is true, because it tests the reference implementation; external documents need only satisfy the semantic spec. Add a spec section stating the distinction and correct the wording in the package, fixtures and tests READMEs.",
-      "status": "done",
-      "completedCommit": "1e3f9e983536c53b806631390877cfc4456d8a54",
-      "dependsOn": [],
-      "assignee": "claude",
-      "category": "feature",
-      "affectedPaths": [
-        "packages/format/src/document.ts",
-        "packages/format/README.md",
-        "plan/docs/02_FRWD_FORMAT_SPEC_V0_1.md",
-        "plan/docs/FRWD_MASTER_DESIGN_SPEC.md",
-        "fixtures/invalid/missing-doctype.json",
-        "fixtures/README.md",
-        "tests/README.md"
-      ],
-      "canParallelize": false,
-      "planDoc": "02_FRWD_FORMAT_SPEC_V0_1.md"
-    },
-    {
-      "id": "t-015",
-      "title": "Harden the native safety profile: dataset type, fail-closed CSS, form/link surfaces",
-      "description": "Three corrections to the profile. First, accept application/frwd-dataset+json as inert FRWD data - the rich-media spec section 7 defines datasets with that type, so the sanitizer currently rejects a construct FRWD 0.1 requires. Second, make css-parse-error an error rather than a warning: if the security layer cannot parse the CSS it cannot establish that the CSS makes no external requests, and the native profile must fail closed. Third, close user-triggered and network surfaces that native 0.1 gains nothing from: forbid <form> (forms are deferred and need an explicit future design and security model), forbid <link> (FRWD already owns its stylesheet in style#frwd-document-style, so an element that can pull in an uninspected stylesheet is pure attack surface), and reject the formaction and ping attributes. Add a focused regression fixture for each, plus a positive fixture proving an inert dataset block is accepted.",
-      "status": "done",
-      "completedCommit": "26bdb7db79b52773115a0035b47d368414151978",
-      "dependsOn": [],
-      "assignee": "claude",
-      "category": "feature",
-      "affectedPaths": [
-        "packages/sanitize/src/rules.ts",
-        "packages/sanitize/src/inspect.ts",
-        "packages/sanitize/src/sanitize.ts",
-        "fixtures/security"
-      ],
-      "canParallelize": false,
-      "planDoc": "09_SECURITY_TRUST_AND_PORTABILITY.md"
-    },
-    {
-      "id": "t-016",
-      "title": "set_theme_token: a safe mechanism for document-owned design",
-      "description": "Narrower than the speculative API in the design document. FRWD provides safe mechanisms for changing document-owned design; it does not standardise the design vocabulary of individual documents, so class names our reference fixtures happen to use do not become format concepts. set_theme_token is the one genuinely new style operation in v0.1: it edits a CSS custom property in style#frwd-document-style through a real CSS AST rather than string replacement, runs through the existing staged atomic transaction machinery, stays subject to the native CSS safety profile, fails rather than guessing when the target scope is ambiguous, is rejected by styleLocked and permitted by contentLocked, and appears in the change record. Scope is explicit - default or dark - because the real documents all pair a light value with a prefers-color-scheme dark counterpart, and textual surgery cannot tell them apart. Figure and layout variants are deliberately NOT enumerated at FRWD level: set_attribute on class is already the mechanism, and a future editor tool can inspect which variants a document defines and compile to that. set_print_target_pages and stylesheet-region replacement stay deferred - page-count targeting is an optimisation goal, not a deterministic operation. Also update the protocol document to separate core operations, document-defined style classes, and high-level agent tools that compile to operations.",
-      "status": "in-progress",
-      "dependsOn": [
-        "t-005"
-      ],
-      "assignee": "claude",
-      "category": "feature",
-      "affectedPaths": [
-        "packages/operations"
-      ],
-      "canParallelize": false,
-      "planDoc": "06_AI_NATIVE_EDITING_PROTOCOL.md"
-    },
-    {
-      "id": "t-017",
-      "title": "Prepared transactions: the reviewed result is the committed result",
-      "description": "preview() and apply() currently run the transaction independently, so rerunning the same envelope is not guaranteed to reproduce the document the user reviewed - minted stable ids and the modified timestamp both differ between runs. For an AI editing protocol the reviewed staged result must be exactly what commits. Introduce commitPrepared(document, prepared), which never reruns the operations, adopts the exact staged tree that was previewed, verifies the live document is still the same document at the same revision and otherwise unchanged since preview, and refuses rather than applying an old decision to a new state. Metadata is already written once during preparation, so the preview shows the final revision and modified value. apply() stays as a convenience and internally prepares then commits, so there is one code path. Regression test: an inserted node with no id and no injected idFactory must show the same id in preview as it has after commitPrepared.",
-      "status": "done",
-      "completedCommit": "10a753eaaca0e01ae3609cc2bf657ff400865696",
-      "dependsOn": [],
-      "assignee": "claude",
-      "category": "feature",
-      "affectedPaths": [
-        "packages/operations/src/transaction.ts",
-        "packages/operations/src/types.ts",
-        "packages/operations/test"
-      ],
-      "canParallelize": false,
-      "planDoc": "06_AI_NATIVE_EDITING_PROTOCOL.md"
-    },
-    {
-      "id": "t-018",
-      "title": "Conformance rule: substantive content must not be trapped in a closed native details",
-      "description": "The cross-browser suite established that no CSS can force-expand a closed native <details> in every engine - ::details-content covers Chromium and Firefox, WebKit has no equivalent - so substantive content inside one can silently vanish from a printout. That breaks the rich-media print contract, which says no component carrying substantive content may disappear from print. Add a checkable rule rather than leaving it as guidance: report a diagnostic when a <details> without open contains substantive content, and point the author at frwd-disclosure or <details open>. Decide which layer owns it - it is a print-contract rule rather than a safety-profile one, so it probably belongs in packages/format's structural validation. Needs a fixture and, once it exists, the WebKit skip in the browser suite can be replaced by a rule that makes the situation unreachable.",
-      "status": "done",
-      "dependsOn": [],
-      "assignee": "claude",
-      "category": "feature",
-      "affectedPaths": [
-        "packages/format",
-        "fixtures"
-      ],
-      "canParallelize": true,
-      "planDoc": "05_RICH_MEDIA_AND_INTERACTIVITY.md",
-      "completedCommit": "6c68455c1db5ead5b7b6bea24c9dc482346066bf"
-    },
-    {
-      "id": "t-019",
-      "title": "Rich manual: time-based media in a flowing document",
-      "description": "The part of the FRWD thesis not yet proved: time-based media can be a natural part of a flowing document rather than an attachment or a link. A designed service manual with real instructional prose, an embedded video at the step it belongs to, poster frame and caption, embedded audio where it makes contextual sense, a small gallery, a safety callout, a disclosure, print fallbacks for every time-based object, responsive behaviour and no external resources. Media assets are deliberately tiny - enough to prove the interaction, not a demo reel - and embedded as data URLs, so no Git LFS. No new FRWD primitives unless the existing model genuinely cannot express something essential; if the fixture exposes a missing primitive, stop and record why first. The scientific and cv documents follow as separate slices.",
-      "status": "done",
-      "dependsOn": [],
-      "assignee": "claude",
-      "category": "feature",
-      "affectedPaths": [
-        "fixtures"
-      ],
-      "canParallelize": true,
-      "planDoc": "13_EXAMPLE_DOCUMENTS.md",
-      "completedCommit": "8464817c03db81eb9e6aca7b9aceaac87799d34b"
-    },
-    {
-      "id": "t-020",
-      "title": "Firefox audio: diagnosed as a test defect, not a portability problem",
-      "description": "Firefox plays the embedded video in fixtures/rich-manual/field-calibration.frwd but leaves the audio at readyState 0. A standalone probe shows Firefox decoding the same Ogg and MP3 from data: URLs without complaint, and decoding them from file:// URLs fails in the same probe - so the encoding is fine and data: URLs are fine, and something about the element configuration or the document context is not. Worth understanding rather than working around, because self-contained audio is part of the portability claim: if there is a real constraint on how audio must be declared for it to work everywhere, the format should say so. The browser suite currently skips this one assertion in Firefox with a pointer here.",
-      "status": "done",
-      "dependsOn": [],
-      "assignee": "claude",
-      "category": "feature",
-      "affectedPaths": [
-        "fixtures/rich-manual",
-        "tests/browser"
-      ],
-      "canParallelize": true,
-      "planDoc": "05_RICH_MEDIA_AND_INTERACTIVITY.md",
-      "completedCommit": "289106891411709007aa4dfc32882644f17c5a34"
-    },
-    {
-      "id": "t-021",
-      "title": "Scientific reference document",
-      "description": "The next designed document after the rich manual: MathML equations as the canonical representation, numbered figures and tables, cross-references, and a references section. Same rules - no document-type-specific format features, only HTML, CSS and existing FRWD primitives, structural and safety conformance, and cross-browser coverage. MathML is the one area likely to expose a genuine gap: if the existing model cannot express something essential, stop and record why before adding a primitive.",
-      "status": "done",
-      "dependsOn": [],
-      "assignee": "claude",
-      "category": "feature",
-      "affectedPaths": [
-        "fixtures"
-      ],
-      "canParallelize": true,
-      "planDoc": "13_EXAMPLE_DOCUMENTS.md",
-      "completedCommit": "bf61bb7db8650d853a9018504de9513f9037d029"
-    },
-    {
       "id": "t-022",
       "title": "CV reference document",
       "description": "The last of the designed corpus, deliberately lowest priority: the business report already demonstrates dense designed two-column content, so this is confirmation rather than evidence. Dense typographic layout and print fidelity in a single page.",
@@ -380,7 +47,23 @@
       ],
       "canParallelize": true,
       "planDoc": "13_EXAMPLE_DOCUMENTS.md"
+    },
+    {
+      "id": "t-023",
+      "title": "Agent integration boundary and editor architecture reconciliation",
+      "description": "Documentation only. Records the durable AI architecture now that the operations write surface is complete enough to describe it without speculation: AI reads through FRWD document tools and writes through FRWD Ops, and the model or agent host is replaceable and not part of the document format. Adds a section to 06_AI_NATIVE_EDITING_PROTOCOL.md covering that AI is external to the document (a .frwd carries no credentials, keys, chat history, agent state, model configuration or required AI runtime), the preferred write path through preview and prepared commit, the agent-facing read surface including render_document as an agent capability rather than a format requirement, that whole-document generation stays valid for initial creation but must clear the same parser, structural validation and safety profile, and that agent hosts - built-in AI, MCP, CLI or SDK, external coding agents, local models, enterprise hosts - are adapters and none of them is normative. Also reconciles 07_EDITOR_ARCHITECTURE.md with decisions since made: the load pipeline inspects rather than sanitizes, so opening an unsafe document never silently mutates it; stable ids are preserved throughout editing rather than restored on save; and React and a ProseMirror or Tiptap class engine are candidates rather than recommendations, with the choice left to the t-023 successor ADR in t-010. Does not choose or implement MCP, PTY integration, model APIs or the AI panel.",
+      "status": "in-progress",
+      "dependsOn": [],
+      "assignee": "claude",
+      "category": "feature",
+      "affectedPaths": [
+        "plan/docs/06_AI_NATIVE_EDITING_PROTOCOL.md",
+        "plan/docs/07_EDITOR_ARCHITECTURE.md",
+        "plan/docs/FRWD_MASTER_DESIGN_SPEC.md"
+      ],
+      "canParallelize": false,
+      "planDoc": "06_AI_NATIVE_EDITING_PROTOCOL.md"
     }
   ],
-  "nextId": 23
+  "nextId": 24
 }
