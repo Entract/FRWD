@@ -80,6 +80,26 @@ It is meant to feel like editing **this object**, not editing CSS source. Someon
 
 Three levels stay distinct, and the tests hold the line: `set_theme_token` for document-wide tokens, the existing attribute operation for document-defined classes, and `set_style_property` for a deliberate local override. Editing shared rules like `.card` is out of scope - changing one affects every card, which is a different question about intent.
 
+## View modes, and what they honestly are
+
+Three things that had been blurring together, kept apart by [ADR 0002](../../plan/docs/adr/0002-no-embedded-paginated-preview.md):
+
+| | |
+|---|---|
+| **Screen** | The document rendered with its own CSS. The canonical digital presentation. |
+| **Paper** | Editor chrome — a sheet on a desk. A way of looking, not a claim about pages. |
+| **Print** | The browser's real print engine, on the real publication. |
+
+The width modes resize the **projection**, never the document. Nothing is written, no revision moves, and there is nothing to undo.
+
+**One honest limit.** Narrowing the surface reflows anything container-relative — grids, flex, percentage widths, text measure — but it does **not** trigger the document's `@media` queries, which evaluate against the browser window. A resized `<div>` cannot change that. The labels say so, and a test pins the behaviour so nobody mistakes it for working responsive preview. Making it real needs the projection to own a viewport, which means an iframe; that is `t-029`.
+
+**`@page` is document state; paper view is an editor preference.** The editor reads a document's `@page` rule and reports it — *Document declares @page size: A4* — and choosing A4 in the switcher never writes one.
+
+A document that declares its own geometry, such as a `.sheet` rule fixing 210mm by 297mm, is expressing document CSS and is preserved exactly. Editor chrome surrounds the document; it does not redefine it. There is a fixture for that.
+
+**Print** publishes the current document and hands it to the browser's print path. Per ADR 0002 there is no embedded paginated preview and no pagination engine: a page cannot see where the engine breaks, and the naive estimate is wrong by a whole page on both designed documents.
+
 ## Read-only is a session property
 
 A file that does not open as a conforming native FRWD is displayed, diagnosed and quarantined. Not partly: no region mounts, no text is editable, no formatting applies, no operation runs, and it cannot be saved over as though it were native. Opening a `.frwd.html` publication lands here, because a publication carries the runtime and a native FRWD carries no script.

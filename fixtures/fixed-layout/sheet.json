@@ -1,0 +1,9 @@
+{
+  "title": "Sheet-geometry document",
+  "description": "Declares its own 210mm x 297mm sheet and its own @page rule. Exists so the editor can be held to preserving deliberate document geometry rather than reinterpreting it when paper view exists.",
+  "conforming": true,
+  "canonical": true,
+  "expectedDiagnostics": [],
+  "profileConforming": true,
+  "expectedProfileDiagnostics": []
+}

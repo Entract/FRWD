@@ -115,3 +115,18 @@ body { margin: 0; background: Canvas; color: CanvasText; }
 }
 .chrome-segmented button + button { border-left: 0; }
 .chrome-segmented button.is-current { background: rgba(64,128,255,0.25); font-weight: 700; }
+
+/* View modes. Chrome only: these change what the projection is shown inside,
+   never the document. Paper is a sheet on a desk, not a claim about pages. */
+.chrome-views button {
+  font: inherit; padding: 0.3rem 0.5rem; cursor: pointer;
+  border: 1px solid rgba(128,128,128,0.45); background: Canvas; color: CanvasText;
+}
+.chrome-views button + button { border-left: 0; }
+.chrome-views button.is-current { background: rgba(64,128,255,0.25); font-weight: 600; }
+
+.chrome-stage.is-paper-desk { background: rgba(90,90,95,0.35); padding-block: 2rem; }
+.chrome-surface.is-paper { box-shadow: 0 2px 20px rgba(0,0,0,0.35); }
+
+.chrome-status { display: flex; gap: 1rem; align-items: baseline; }
+.chrome-view-note { margin-left: auto; opacity: 0.6; }

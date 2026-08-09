@@ -69,7 +69,7 @@
       "id": "t-027",
       "title": "Selected-object style and layout inspector",
       "description": "Make the visual document directly adjustable without turning FRWD into a canvas or letting the editor rewrite arbitrary stylesheet text. Adds two core operations, set_style_property and remove_style_property, editing exactly one identified element inline declaration block through a real CSS declaration model rather than string surgery: unrelated declarations preserved, staged and atomic and prepared-transaction compatible, unsafe values refused rather than sanitized, styleLocked rejects and contentLocked permits, and the change record names target, property and value. They are core because their meaning is deterministic - two implementations must agree what setting property X to value Y on element Z means - while make_card_prettier and make_three_columns stay editor tools. Three styling levels stay distinct: set_theme_token for document-wide tokens, document-defined classes through the existing attribute operation with no FRWD enum of variant names, and the new operation for deliberate local overrides. Shared CSS selector rules are explicitly out of scope, because changing one affects many objects and raises a different scope question. Adds a properties sidebar for the current selection covering spacing, sizing and alignment, contextual grid columns and gap, a small appearance set, and the element class list, distinguishing an inherited or rule-derived value from a local override and offering a way to clear one. getComputedStyle is read-only evidence about what rendered; the canonical state stays the FRWD DOM and its CSS, and selecting an object with no edit stays a no-op. No fixture class names anywhere. Not in scope: shared rule editing, stylesheet source editing, free positioning, breakpoint editor, page size, page/flow modes, AI panel, importer, collaboration.",
-      "status": "in-progress",
+      "status": "done",
       "dependsOn": [],
       "assignee": "claude",
       "category": "feature",
@@ -79,8 +79,42 @@
         "tests/editor"
       ],
       "canParallelize": false,
-      "planDoc": "06_AI_NATIVE_EDITING_PROTOCOL.md"
+      "planDoc": "06_AI_NATIVE_EDITING_PROTOCOL.md",
+      "completedCommit": "57f574e59f926f599ce17eb4cd0cedcf82843384"
+    },
+    {
+      "id": "t-028",
+      "title": "View modes and a pagination architecture spike",
+      "description": "Not a pagination engine. Make the editor distinguish three things that have been blurring together: the document real screen CSS, an editor paper visualisation, and actual print output. Spike what a browser can honestly tell a page about print - @page rules, break positions, page count, page boxes - and answer whether native primitives can support a trustworthy embedded print preview or whether FRWD eventually needs a paged-media layer, recording the answer as an ADR if it has architectural consequences. Explicitly do not fake page boundaries by dividing scrollHeight by A4 height. Then implement only the safe controls: an editor viewport switcher (fit, mobile, tablet, desktop) that changes the projection and not the document, and a paper frame that is editor chrome, with the document own fixed geometry preserved faithfully where a document defines it - a CV that declares .sheet { width: 210mm } is document CSS, not evidence that FRWD is page-based. Surface any @page declaration as information; the paper choice is an editor preference and @page is document state, and the two must not leak into each other. If trustworthy embedded preview is unavailable, prefer the real browser print engine over a fake in-editor paginator. Regression coverage for both a flowing fixture and a deliberately fixed-geometry one, proving view switching leaves the canonical source byte-identical with no revision or undo entry. Out of scope: a pagination engine or dependency, automatic fitting to N pages, editing @page through the UI, breakpoint editor, shared CSS-rule editor, importer, AI panel.",
+      "status": "in-progress",
+      "dependsOn": [],
+      "assignee": "claude",
+      "category": "feature",
+      "affectedPaths": [
+        "apps/editor/src",
+        "tests/editor",
+        "tests/browser",
+        "plan/docs/adr",
+        "fixtures"
+      ],
+      "canParallelize": false,
+      "planDoc": "04_STYLE_LAYOUT_AND_PAGINATION.md"
+    },
+    {
+      "id": "t-029",
+      "title": "Give the projection its own viewport so responsive preview is real",
+      "description": "Found while building the view switcher in t-028. Narrowing the projection container reflows anything container-relative - grids, flex, percentage widths, text measure - but does not trigger the document @media queries, because those evaluate against the browser window and no amount of resizing a div changes that. The mobile and tablet views therefore preview width, not responsiveness, and are labelled that way rather than pretending otherwise, with a test pinning the limitation so it cannot be mistaken for working. Making it real means hosting the projection in an iframe so it owns a viewport. That is a genuine change rather than a tweak: the region editor, the drag handle, the breadcrumb and every listener currently assume a single document, and ProseMirror would be mounting into another one. Worth doing - author once and inspect the same document across breakpoints is one of the format most useful claims - but worth doing deliberately.",
+      "status": "pending",
+      "dependsOn": [],
+      "assignee": "claude",
+      "category": "feature",
+      "affectedPaths": [
+        "apps/editor/src",
+        "tests/editor"
+      ],
+      "canParallelize": false,
+      "planDoc": "07_EDITOR_ARCHITECTURE.md"
     }
   ],
-  "nextId": 28
+  "nextId": 30
 }

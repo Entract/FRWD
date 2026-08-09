@@ -1,4 +1,5 @@
 import { readFileSync } from "node:fs";
+import "./support/hook.js";
 import { resolve } from "node:path";
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import { FrwdDocument, getAttr } from "@frwd/format";
@@ -14,12 +15,6 @@ import { inspect } from "@frwd/sanitize";
  */
 
 const REPORT = resolve(process.cwd(), "fixtures", "business-report", "annual-review.frwd");
-
-declare global {
-  interface Window {
-    __frwdEditor: { source: () => string | null; readOnly: () => boolean | null; diagnostics: () => string[] };
-  }
-}
 
 const source = (page: Page): Promise<string> =>
   page.evaluate(() => window.__frwdEditor.source() ?? "");

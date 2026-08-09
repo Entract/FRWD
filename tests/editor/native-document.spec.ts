@@ -1,4 +1,5 @@
 import { readFileSync } from "node:fs";
+import "./support/hook.js";
 import { resolve } from "node:path";
 import { expect, test, type Page } from "@playwright/test";
 import { FrwdDocument } from "@frwd/format";
@@ -13,18 +14,6 @@ import { inspect } from "@frwd/sanitize";
  */
 
 const FIXTURE = resolve(process.cwd(), "fixtures", "business-report", "annual-review.frwd");
-
-interface Introspection {
-  source: () => string | null;
-  readOnly: () => boolean | null;
-  diagnostics: () => string[];
-}
-
-declare global {
-  interface Window {
-    __frwdEditor: Introspection;
-  }
-}
 
 async function openFixture(page: Page, path = FIXTURE): Promise<void> {
   await page.goto("/");

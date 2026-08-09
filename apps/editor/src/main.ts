@@ -38,11 +38,14 @@ interface Shell {
   drop: HTMLElement;
   stage: HTMLElement;
   panel: HTMLElement;
+  views: HTMLElement;
+  viewNote: HTMLElement;
   style: HTMLStyleElement;
   status: HTMLElement;
 }
 
 let session: EditorSession | null = null;
+let lastPrintSource: string | null = null;
 let region: Region | null = null;
 let regionSnapshot: string | null = null;
 
@@ -65,12 +68,21 @@ function build(): Shell {
       <span class="chrome-group">
         <button id="theme">Theme token…</button>
       </span>
+      <span class="chrome-group chrome-views" id="views">
+        <button data-view="fit" class="is-current">Fit</button>
+        <button data-view="mobile">Mobile</button>
+        <button data-view="tablet">Tablet</button>
+        <button data-view="desktop">Desktop</button>
+        <button data-view="a4">A4</button>
+        <button data-view="letter">Letter</button>
+      </span>
       <span class="chrome-group">
         <button id="undo">Undo</button>
         <button id="redo">Redo</button>
       </span>
       <span class="chrome-spacer"></span>
       <button id="save">Save .frwd</button>
+      <button id="print">Print…</button>
       <button id="publish">Publish .frwd.html</button>
     </header>
     <div id="quarantine" class="chrome-quarantine" hidden></div>
@@ -83,7 +95,7 @@ function build(): Shell {
       </main>
       <aside class="chrome-panel" id="panel" aria-label="Properties"></aside>
     </div>
-    <footer class="chrome-status" id="status">Open a .frwd file to begin.</footer>
+    <footer class="chrome-status"><span id="status">Open a .frwd file to begin.</span><span id="view-note" class="chrome-view-note"></span></footer>
     <style id="document-style"></style>
   `;
 
@@ -96,6 +108,8 @@ function build(): Shell {
     drop: root.querySelector("#drop") as HTMLElement,
     stage: root.querySelector(".chrome-stage") as HTMLElement,
     panel: root.querySelector("#panel") as HTMLElement,
+    views: root.querySelector("#views") as HTMLElement,
+    viewNote: root.querySelector("#view-note") as HTMLElement,
     style: root.querySelector("#document-style") as HTMLStyleElement,
     status: root.querySelector("#status") as HTMLElement,
   };
@@ -129,6 +143,9 @@ function render(): void {
     element.addEventListener("mousedown", onBlockMouseDown);
   }
 
+  // The view survives a re-projection: re-rendering the document should not
+  // quietly put the editor back into a different way of looking at it.
+  applyView(view);
   updateButtons();
 }
 
@@ -644,6 +661,75 @@ function installDragHandle(): void {
 
 installDragHandle();
 
+
+/**
+ * Editor view modes.
+ *
+ * ADR 0002: these change the **projection**, never the document. No view mode
+ * touches the canonical source, bumps a revision, or creates an undo entry.
+ *
+ * **Known limitation, stated rather than hidden.** Narrowing the surface gives
+ * the document less room, so anything sized relative to its container reflows -
+ * grids, flex, percentage widths, text measure. It does *not* trigger the
+ * document's `@media` queries, because those evaluate against the browser
+ * window and no amount of resizing a `<div>` changes that. Making media
+ * queries respond needs the projection to have its own viewport, which means
+ * hosting it in an iframe - a real change, since the region editor, the drag
+ * handle and every listener currently assume one document. The labels below say
+ * what these actually do.
+ *
+ * Paper is chrome - a sheet on a desk - and is deliberately not called a print
+ * preview, because nothing here knows where pages break.
+ */
+type ViewMode = "fit" | "mobile" | "tablet" | "desktop" | "a4" | "letter";
+
+const NARROW_NOTE = "Layout reflows; media queries still follow the browser window.";
+
+const VIEWS: Record<ViewMode, { width: string | null; paper: boolean; label: string }> = {
+  fit: { width: null, paper: false, label: "Fitting the window." },
+  mobile: { width: "390px", paper: false, label: `Width 390px. ${NARROW_NOTE}` },
+  tablet: { width: "768px", paper: false, label: `Width 768px. ${NARROW_NOTE}` },
+  desktop: { width: "1200px", paper: false, label: `Width 1200px. ${NARROW_NOTE}` },
+  a4: { width: "210mm", paper: true, label: "A4 width, as an editor view. Not a print preview - use Print." },
+  letter: { width: "8.5in", paper: true, label: "Letter width, as an editor view. Not a print preview - use Print." },
+};
+
+let view: ViewMode = "fit";
+
+function applyView(mode: ViewMode): void {
+  view = mode;
+  const settings = VIEWS[mode];
+
+  shell.surface.style.width = settings.width ?? "";
+  shell.surface.style.maxWidth = settings.width === null ? "" : "100%";
+  shell.surface.classList.toggle("is-paper", settings.paper);
+  shell.stage.classList.toggle("is-paper-desk", settings.paper);
+
+  for (const button of Array.from(shell.views.querySelectorAll("button"))) {
+    button.classList.toggle("is-current", button.dataset["view"] === mode);
+  }
+
+  shell.viewNote.textContent = settings.label + declaredPageTarget();
+  if (selection) positionHandle();
+}
+
+/**
+ * What the document says about paper, as opposed to what the editor is showing.
+ *
+ * Read-only. `@page` is document state and the view switcher is an editor
+ * preference; choosing A4 here must never write a rule into the document.
+ */
+function declaredPageTarget(): string {
+  const css = session?.document.css;
+  if (!css) return "";
+
+  const rule = /@page[^{]*{([^}]*)}/.exec(css);
+  if (!rule) return "";
+
+  const size = /sizes*:s*([^;]+)/.exec(rule[1] ?? "");
+  return size ? ` Document declares @page size: ${size[1]!.trim()}.` : " Document declares its own @page rule.";
+}
+
 const toolbar = shell.root.querySelector(".chrome-bar") as HTMLElement;
 
 // Pressing a toolbar button must not take focus or selection away from the
@@ -654,6 +740,44 @@ const toolbar = shell.root.querySelector(".chrome-bar") as HTMLElement;
 toolbar.addEventListener("mousedown", (event) => {
   const target = event.target as HTMLElement;
   if (target.closest("button")) event.preventDefault();
+});
+
+shell.views.addEventListener("click", (event) => {
+  const mode = (event.target as HTMLElement).dataset["view"] as ViewMode | undefined;
+  if (mode) applyView(mode);
+});
+
+/**
+ * Print through the browser's own engine, on the real publication.
+ *
+ * ADR 0002: the only trustworthy preview is the one the print engine produces,
+ * so this hands it the published document rather than the editor's screen DOM.
+ * The canonical source is not touched.
+ */
+shell.root.querySelector("#print")!.addEventListener("click", () => {
+  if (!session) return;
+  commitRegion();
+
+  const result = session.publish();
+  if (!result.ok || !result.html) {
+    say(`Cannot print: ${result.errors.map((error) => error.code).join(", ")}`);
+    return;
+  }
+
+  lastPrintSource = result.html;
+
+  const frame = document.createElement("iframe");
+  frame.setAttribute("aria-hidden", "true");
+  frame.style.cssText = "position:fixed;right:0;bottom:0;width:1px;height:1px;opacity:0;border:0";
+  frame.srcdoc = result.html;
+  frame.addEventListener("load", () => {
+    frame.contentWindow?.focus();
+    frame.contentWindow?.print();
+    window.setTimeout(() => frame.remove(), 1000);
+  });
+  document.body.appendChild(frame);
+
+  say("Printing the published document through the browser.");
 });
 
 document.addEventListener("mousedown", (event) => {
@@ -671,5 +795,7 @@ if (import.meta.env.DEV) {
     source: () => session?.save() ?? null,
     readOnly: () => session?.readOnly ?? null,
     diagnostics: () => session?.diagnostics.map((diagnostic) => diagnostic.code) ?? [],
+    view: () => view,
+    lastPrintSource: () => lastPrintSource,
   };
 }

@@ -1,4 +1,5 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import "./support/hook.js";
 import { dirname, resolve } from "node:path";
 import { expect, test, type Page } from "@playwright/test";
 import { FrwdDocument } from "@frwd/format";
@@ -29,12 +30,6 @@ const PUBLICATION = (() => {
 })();
 
 const WITH_SCRIPT = resolve(root, "fixtures", "security", "inline-script.frwd");
-
-declare global {
-  interface Window {
-    __frwdEditor: { source: () => string | null; readOnly: () => boolean | null; diagnostics: () => string[] };
-  }
-}
 
 async function open(page: Page, path: string): Promise<void> {
   await page.goto("/");

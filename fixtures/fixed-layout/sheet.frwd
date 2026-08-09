@@ -1,0 +1,50 @@
+<!DOCTYPE html><html data-frwd-version="0.1" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1" name="viewport">
+<meta content="f4e3d2c1-0b9a-4867-8564-3d2c1b0a9f87" name="frwd-document-id">
+<title>Sheet-geometry document</title>
+<script id="frwd-manifest" type="application/frwd+json">
+{
+  "format": "frwd",
+  "version": "0.1",
+  "documentId": "f4e3d2c1-0b9a-4867-8564-3d2c1b0a9f87",
+  "title": "Sheet-geometry document",
+  "created": "2026-08-10T09:00:00Z",
+  "modified": "2026-08-10T09:00:00Z",
+  "language": "en",
+  "description": "A document that declares its own fixed sheet geometry and its own @page rule. FRWD is not page-based; this document has simply chosen to be, and the editor must preserve that faithfully rather than reinterpret it."
+}
+</script>
+<style id="frwd-document-style">
+@page { size: A4; margin: 12mm; }
+:root { color-scheme: light dark; --ink: #14171c; --paper: #fff; }
+body { margin: 0; background: #6b6f76; color: var(--ink); font: 400 11pt/1.5 ui-serif, Georgia, serif; }
+main { display: block; padding: 8mm; }
+.sheet {
+  width: 210mm;
+  min-height: 297mm;
+  margin: 0 auto;
+  padding: 18mm;
+  background: var(--paper);
+  box-shadow: 0 1px 8px rgba(0,0,0,0.35);
+  box-sizing: border-box;
+}
+h1 { font: 600 20pt/1.15 ui-sans-serif, system-ui, sans-serif; margin: 0 0 4mm; }
+p { margin: 0 0 3mm; }
+@media print {
+  body { background: #fff; }
+  main { padding: 0; }
+  .sheet { width: auto; min-height: 0; margin: 0; padding: 0; box-shadow: none; }
+}
+</style>
+</head>
+<body>
+<main data-frwd-document="">
+<article data-frwd-id="f4e3d2c1-0b9a-4867-8564-3d2c1b0a9001" class="sheet">
+<h1 data-frwd-id="f4e3d2c1-0b9a-4867-8564-3d2c1b0a9002">Sheet-geometry document</h1>
+<p data-frwd-id="f4e3d2c1-0b9a-4867-8564-3d2c1b0a9003">This document declares its own fixed geometry: a 210mm by 297mm sheet, and an <code>@page</code> rule to match. That is document CSS, deliberately authored, and the editor preserves it exactly.</p>
+<p data-frwd-id="f4e3d2c1-0b9a-4867-8564-3d2c1b0a9004">It is not evidence that FRWD is page-based. A document may choose to look like paper; the format does not require it, and the editor's own paper view is a separate thing that surrounds the document rather than redefining it.</p>
+</article>
+</main>
+
+</body></html>
