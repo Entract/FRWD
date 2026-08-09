@@ -325,7 +325,37 @@
       "id": "t-019",
       "title": "Rich manual: time-based media in a flowing document",
       "description": "The part of the FRWD thesis not yet proved: time-based media can be a natural part of a flowing document rather than an attachment or a link. A designed service manual with real instructional prose, an embedded video at the step it belongs to, poster frame and caption, embedded audio where it makes contextual sense, a small gallery, a safety callout, a disclosure, print fallbacks for every time-based object, responsive behaviour and no external resources. Media assets are deliberately tiny - enough to prove the interaction, not a demo reel - and embedded as data URLs, so no Git LFS. No new FRWD primitives unless the existing model genuinely cannot express something essential; if the fixture exposes a missing primitive, stop and record why first. The scientific and cv documents follow as separate slices.",
+      "status": "done",
+      "dependsOn": [],
+      "assignee": "claude",
+      "category": "feature",
+      "affectedPaths": [
+        "fixtures"
+      ],
+      "canParallelize": true,
+      "planDoc": "13_EXAMPLE_DOCUMENTS.md",
+      "completedCommit": "8464817c03db81eb9e6aca7b9aceaac87799d34b"
+    },
+    {
+      "id": "t-020",
+      "title": "Diagnose Firefox audio decode in the rich manual",
+      "description": "Firefox plays the embedded video in fixtures/rich-manual/field-calibration.frwd but leaves the audio at readyState 0. A standalone probe shows Firefox decoding the same Ogg and MP3 from data: URLs without complaint, and decoding them from file:// URLs fails in the same probe - so the encoding is fine and data: URLs are fine, and something about the element configuration or the document context is not. Worth understanding rather than working around, because self-contained audio is part of the portability claim: if there is a real constraint on how audio must be declared for it to work everywhere, the format should say so. The browser suite currently skips this one assertion in Firefox with a pointer here.",
       "status": "in-progress",
+      "dependsOn": [],
+      "assignee": "claude",
+      "category": "feature",
+      "affectedPaths": [
+        "fixtures/rich-manual",
+        "tests/browser"
+      ],
+      "canParallelize": true,
+      "planDoc": "05_RICH_MEDIA_AND_INTERACTIVITY.md"
+    },
+    {
+      "id": "t-021",
+      "title": "Scientific reference document",
+      "description": "The next designed document after the rich manual: MathML equations as the canonical representation, numbered figures and tables, cross-references, and a references section. Same rules - no document-type-specific format features, only HTML, CSS and existing FRWD primitives, structural and safety conformance, and cross-browser coverage. MathML is the one area likely to expose a genuine gap: if the existing model cannot express something essential, stop and record why before adding a primitive.",
+      "status": "pending",
       "dependsOn": [],
       "assignee": "claude",
       "category": "feature",
@@ -336,20 +366,19 @@
       "planDoc": "13_EXAMPLE_DOCUMENTS.md"
     },
     {
-      "id": "t-020",
-      "title": "Diagnose Firefox audio decode in the rich manual",
-      "description": "Firefox plays the embedded video in fixtures/rich-manual/field-calibration.frwd but leaves the audio at readyState 0. A standalone probe shows Firefox decoding the same Ogg and MP3 from data: URLs without complaint, and decoding them from file:// URLs fails in the same probe - so the encoding is fine and data: URLs are fine, and something about the element configuration or the document context is not. Worth understanding rather than working around, because self-contained audio is part of the portability claim: if there is a real constraint on how audio must be declared for it to work everywhere, the format should say so. The browser suite currently skips this one assertion in Firefox with a pointer here.",
+      "id": "t-022",
+      "title": "CV reference document",
+      "description": "The last of the designed corpus, deliberately lowest priority: the business report already demonstrates dense designed two-column content, so this is confirmation rather than evidence. Dense typographic layout and print fidelity in a single page.",
       "status": "pending",
       "dependsOn": [],
       "assignee": "claude",
       "category": "feature",
       "affectedPaths": [
-        "fixtures/rich-manual",
-        "tests/browser"
+        "fixtures"
       ],
       "canParallelize": true,
-      "planDoc": "05_RICH_MEDIA_AND_INTERACTIVITY.md"
+      "planDoc": "13_EXAMPLE_DOCUMENTS.md"
     }
   ],
-  "nextId": 21
+  "nextId": 23
 }

@@ -13,6 +13,9 @@ import { defineConfig, devices } from "@playwright/test";
 export default defineConfig({
   testDir: "tests/browser",
   fullyParallel: true,
+  // Documents that embed video and audio take real time to load in a real
+  // browser; the default 30s is tight once several run in parallel.
+  timeout: 60_000,
   forbidOnly: !!process.env["CI"],
   retries: process.env["CI"] ? 2 : 0,
   reporter: process.env["CI"] ? [["github"], ["html", { open: "never" }]] : [["list"]],

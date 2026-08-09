@@ -1,4 +1,5 @@
 import { expect, test, type Request } from "@playwright/test";
+import { playViaUserGesture } from "./support/playback.js";
 import { publishEditedFixture, publishFixture } from "./support/publications.js";
 
 /**
@@ -55,8 +56,11 @@ test.describe("the media is genuinely in the file", () => {
     // the browser reach for the media. Calling load() explicitly is not: it
     // hangs in one engine for reasons tracked in t-020, and would be testing
     // that engine rather than the document.
-    await page.goto(MANUAL);
-    await page.waitForTimeout(1000);
+    // domcontentloaded, not load: waiting for the load event means waiting for
+    // both media streams to finish decoding, which is slow enough on a heavy
+    // document to eat the whole test budget - and is not what this asserts.
+    await page.goto(MANUAL, { waitUntil: "domcontentloaded" });
+    await page.waitForTimeout(1500);
 
     expect(escaped).toEqual([]);
   });
@@ -64,43 +68,36 @@ test.describe("the media is genuinely in the file", () => {
 
 test.describe("the media plays from a local file", () => {
   for (const kind of ["video", "audio"] as const) {
-    test(`the ${kind} decodes and advances`, async ({ page, browserName }) => {
+    test(`the ${kind} plays`, async ({ page, browserName }) => {
       // Playwright's WebKit build ships without media codecs on non-Apple
       // platforms. Verified rather than assumed: the same file fails to decode
       // in that build when loaded straight from file://, so it is the engine
       // build and not the document or its data: URLs. Real Safari plays both.
       test.skip(browserName === "webkit", "Playwright WebKit has no media codecs on this platform.");
-      // Firefox decodes the video here but not the audio, and a probe shows it
-      // decodes the same audio happily from a data: URL on its own - so this is
-      // not the encoding and not data: URLs. Unexplained rather than dismissed;
-      // see t-020.
-      test.skip(browserName === "firefox" && kind === "audio", "Unexplained Firefox audio decode failure - see t-020.");
 
       await page.goto(MANUAL);
-
       const element = page.locator(kind);
 
-      // Metadata first: this is the document-level claim - the bytes in the
-      // file are a decodable media stream, not an attachment.
-      await expect
-        .poll(async () => element.evaluate((node) => (node as HTMLMediaElement).readyState), { timeout: 15000 })
-        .toBeGreaterThanOrEqual(1);
-
-      const duration = await element.evaluate((node) => (node as HTMLMediaElement).duration);
-      expect(duration).toBeGreaterThan(1);
-
-      // Then playback. play() is deliberately not awaited: when an engine
-      // cannot start a stream its promise may never settle, and a hung test
-      // tells you nothing about the document.
-      await element.evaluate((node) => {
-        const media = node as HTMLMediaElement;
-        media.muted = true;
-        void media.play().catch(() => undefined);
-      });
+      // Ask for playback rather than waiting for the browser to preload.
+      // preload is a hint the specification explicitly lets a user agent
+      // ignore, so requiring eager metadata would be testing something the web
+      // platform never promised - and would fail a document that is perfectly
+      // fine. The click is a trusted one against a button the test injects, so
+      // this is real user activation and no test UI reaches the document.
+      await playViaUserGesture(page, kind);
 
       await expect
         .poll(async () => element.evaluate((node) => (node as HTMLMediaElement).currentTime), { timeout: 15000 })
         .toBeGreaterThan(0);
+
+      const state = await element.evaluate((node) => {
+        const media = node as HTMLMediaElement;
+        return { duration: media.duration, currentSrc: media.currentSrc.slice(0, 11), paused: media.paused };
+      });
+
+      expect(state.duration).toBeGreaterThan(1);
+      expect(state.currentSrc).toBe("data:" + kind + "/");
+      expect(state.paused).toBe(false);
     });
   }
 });

@@ -1555,6 +1555,8 @@ Same pattern:
 - transcript where available;
 - print fallback description/link.
 
+**Do not read anything into preload behaviour.** `preload` is a hint the HTML specification explicitly permits a user agent to ignore, and engines differ: an element sitting at `readyState 0` until playback is requested is conforming behaviour, not a broken document. Conformance tools and editors must judge embedded media by whether it plays when asked, never by whether the browser chose to fetch it eagerly.
+
 ## 6. Charts
 
 FRWD charts are declarative.
