@@ -29,7 +29,8 @@
       "id": "t-002",
       "title": "packages/format - parse, serialize and stable object identity",
       "description": "Framework-agnostic TypeScript package that reads and writes a .frwd document as semantic HTML. Provides: document parse into an in-memory view, stable data-frwd-id assignment and preservation, metadata block read/write, CSS/theme and embedded asset handling, deterministic serialization. Acceptance is semantic round-trip stability: a no-op open/save preserves document identity, all stable ids, semantic structure, content, CSS, metadata and embedded assets. Serialization must be deterministic (same input produces same bytes), but exact original whitespace and attribute formatting are NOT format invariants. No editor or UI framework dependencies.",
-      "status": "in-progress",
+      "status": "done",
+      "completedCommit": "46f39ae9ad7349477118ee257a59f862962bf04d",
       "dependsOn": [
         "t-001"
       ],
@@ -61,7 +62,7 @@
     {
       "id": "t-004",
       "title": "packages/sanitize - enforce the native no-script profile",
-      "description": "Framework-agnostic sanitizer enforcing the native .frwd profile: no arbitrary executable JavaScript, no event-handler attributes, no external script or unsafe URL schemes, allow-list of elements/attributes/CSS consistent with the security document. Includes security test fixtures for known injection vectors. Must be usable both on import (untrusted document) and on export.",
+      "description": "Framework-agnostic sanitizer enforcing the native .frwd profile: no arbitrary executable JavaScript, no event-handler attributes, no external script or unsafe URL schemes, allow-list of elements/attributes/CSS consistent with the security document. Includes security test fixtures for known injection vectors. Must be usable both on import (untrusted document) and on export. Sanitize emits Diagnostic values in the same shape packages/format uses, and this task must also introduce the composed conformance result: a structurally valid FRWD that contains arbitrary executable script is NOT a conforming native FRWD, so the public answer to 'is this a conforming native document?' has to combine the structural layer and the safety profile rather than either alone.",
       "status": "pending",
       "dependsOn": [
         "t-003"
@@ -191,7 +192,39 @@
         "plan/docs/00_START_HERE.md"
       ],
       "canParallelize": false
+    },
+    {
+      "id": "t-012",
+      "title": "Make document conformance reflect the current tree",
+      "description": "FrwdDocument.diagnostics is captured once during parse, so it goes stale as soon as any method mutates the canonical tree - a document parsed with missing ids keeps reporting non-conforming after ensureIds() has fixed them. Replace the snapshot with a validate() method over the current tree and a diagnostics getter that calls it, so validation can never disagree with the document. Also remove the O(n-squared) scan for ids outside the document root, which is what would otherwise make a recomputing getter expensive, and raise missing-stable-id from warning to error: spec section 6 says an editable block MUST carry data-frwd-id, and grading a MUST as a warning was wrong. Regression test: a document with missing ids parses non-conforming, and becomes conforming after ensureIds().",
+      "status": "in-progress",
+      "dependsOn": [],
+      "assignee": "claude",
+      "category": "feature",
+      "affectedPaths": [
+        "packages/format/src/document.ts",
+        "packages/format/test"
+      ],
+      "canParallelize": false,
+      "planDoc": "02_FRWD_FORMAT_SPEC_V0_1.md"
+    },
+    {
+      "id": "t-013",
+      "title": "Docs language pass: outward-facing README, durable non-goals",
+      "description": "Remove conversational artefacts from the public-facing language without changing the format architecture. Rewrite README.md to be concise and outward-facing: what FRWD is, why it exists, the core architectural idea, status, and how to explore or contribute. Across the design pack, treat concrete document types (reports, CVs, manuals, papers) as examples rather than defining boundaries, and delete negatives that only make sense inside the design conversation - notably 'FRWD is not a CV maker, a presentation format, a web-page builder' and 'the CV is a useful demo, not the product definition'. Keep genuine architectural non-goals: slide or canvas layout, spreadsheet, macro or code execution environment, cloud-dependent workspace. FRWD_MASTER_DESIGN_SPEC.md consolidates the other documents and must be kept in step.",
+      "status": "pending",
+      "dependsOn": [],
+      "assignee": "claude",
+      "category": "github",
+      "affectedPaths": [
+        "README.md",
+        "plan/docs/00_START_HERE.md",
+        "plan/docs/01_PRODUCT_VISION.md",
+        "plan/docs/FRWD_MASTER_DESIGN_SPEC.md"
+      ],
+      "canParallelize": true,
+      "planDoc": "01_PRODUCT_VISION.md"
     }
   ],
-  "nextId": 12
+  "nextId": 14
 }

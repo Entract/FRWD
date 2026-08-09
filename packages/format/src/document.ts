@@ -26,11 +26,9 @@ import type {
  */
 export class FrwdDocument {
   readonly tree: Document;
-  readonly diagnostics: readonly Diagnostic[];
 
-  private constructor(tree: Document, diagnostics: Diagnostic[]) {
+  private constructor(tree: Document) {
     this.tree = tree;
-    this.diagnostics = diagnostics;
   }
 
   /**
@@ -52,14 +50,38 @@ export class FrwdDocument {
       }
     }
 
-    return new FrwdDocument(tree, diagnose(tree));
+    return new FrwdDocument(tree);
+  }
+
+  /**
+   * Validate the document as it stands right now.
+   *
+   * Computed on every call rather than captured at parse. The tree is mutable -
+   * `ensureIds`, the manifest setter, `css` and `touch` all change it - and a
+   * cached verdict would keep reporting problems the caller has already fixed.
+   * Recomputing is a linear pass, which is cheap next to the cost of being
+   * wrong about whether a document conforms.
+   *
+   * This covers the structural layer only. The native safety profile is
+   * `@frwd/sanitize`'s rule, and the public answer to "is this a conforming
+   * native FRWD?" composes both: a structurally valid document carrying
+   * executable script does not conform, however clean its structure.
+   */
+  validate(): Diagnostic[] {
+    return diagnose(this.tree);
+  }
+
+  /** Structural problems with the document as it stands. Recomputed on access. */
+  get diagnostics(): Diagnostic[] {
+    return this.validate();
   }
 
   /** Errors block a document from being treated as conforming; warnings do not. */
   get errors(): Diagnostic[] {
-    return this.diagnostics.filter((diagnostic) => diagnostic.severity === "error");
+    return this.validate().filter((diagnostic) => diagnostic.severity === "error");
   }
 
+  /** Structurally conforming. Does not yet include the native safety profile. */
   get isConforming(): boolean {
     return this.errors.length === 0;
   }
@@ -213,11 +235,14 @@ function diagnose(tree: Document): Diagnostic[] {
   }
 
   // An id outside the document root cannot be addressed by a semantic
-  // operation, so it is almost certainly a mistake.
+  // operation, so it is almost certainly a mistake. Membership is collected in
+  // one pass rather than re-walking the root per candidate, which kept this
+  // whole function linear once validation became something we recompute.
   if (root) {
+    const insideRoot = new Set<Element>(walkElements(root));
     for (const element of walkElements(tree)) {
       if (getAttr(element, ID_ATTR) === undefined) continue;
-      if (!containsElement(root, element)) {
+      if (!insideRoot.has(element)) {
         diagnostics.push({
           severity: "warning",
           code: "id-outside-document-root",
@@ -228,13 +253,6 @@ function diagnose(tree: Document): Diagnostic[] {
   }
 
   return diagnostics;
-}
-
-function containsElement(ancestor: Element, candidate: Element): boolean {
-  for (const element of walkElements(ancestor)) {
-    if (element === candidate) return true;
-  }
-  return false;
 }
 
 export { stringifyManifest };

@@ -53,12 +53,26 @@ describe("stable identity", () => {
     expect([...findDuplicateIds(document.root!).keys()]).toEqual(["dup"]);
   });
 
-  it("warns about block objects that carry no id", () => {
+  it("reports block objects that carry no id as errors", () => {
+    // Spec section 6 is a MUST: a block without an id cannot be addressed by
+    // any semantic operation, so the document does not conform.
     const document = FrwdDocument.parse(WITHOUT_IDS);
-    const codes = document.diagnostics.filter((d) => d.code === "missing-stable-id");
+    const found = document.diagnostics.filter((d) => d.code === "missing-stable-id");
 
-    expect(codes).toHaveLength(3);
-    expect(codes.every((d) => d.severity === "warning")).toBe(true);
+    expect(found).toHaveLength(3);
+    expect(found.every((d) => d.severity === "error")).toBe(true);
+  });
+
+  it("becomes conforming once ensureIds has fixed the missing ids", () => {
+    // Validation must reflect the tree as it stands, not as it was parsed.
+    const document = FrwdDocument.parse(WITHOUT_IDS);
+    expect(document.isConforming).toBe(false);
+
+    document.ensureIds(sequentialIds());
+
+    expect(document.isConforming).toBe(true);
+    expect(document.errors).toEqual([]);
+    expect(FrwdDocument.parse(document.toHtml()).isConforming).toBe(true);
   });
 
   it("knows which elements need an id", () => {

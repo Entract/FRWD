@@ -13,8 +13,9 @@ import { FrwdDocument } from "@frwd/format";
 
 const document = FrwdDocument.parse(source);
 
+document.validate();     // structural problems with the tree as it stands
+document.diagnostics;    // same, as a getter
 document.isConforming;   // false if any diagnostic is an error
-document.diagnostics;    // structural problems, never thrown
 document.manifest;       // required + recommended metadata
 document.css;            // <style id="frwd-document-style">
 document.assets;         // asset metadata blocks
@@ -63,7 +64,16 @@ refusing to read it would strand the user's content. Problems come back as
 quietly rewrites what it opened cannot promise a stable round-trip. Pass an id
 factory to make assignment reproducible.
 
+**Validation reflects the tree, not the parse.** `validate()` runs over the
+document as it stands on every call. The tree is mutable, and a verdict cached
+at parse time would keep reporting problems the caller has already fixed — a
+document with missing ids stops being non-conforming the moment `ensureIds()`
+runs. The pass is linear, which is cheap next to being wrong about conformance.
+
 **Profile enforcement lives elsewhere.** The no-script native profile is
-`@frwd/sanitize`'s rule to keep, so that one rule has one owner.
+`@frwd/sanitize`'s rule to keep, so that one rule has one owner. `isConforming`
+here means *structurally* conforming. The public answer to "is this a conforming
+native FRWD?" composes both layers: a structurally perfect document carrying
+executable script does not conform.
 
 Implemented in task `t-002`. Conformance fixtures follow in `t-003`.

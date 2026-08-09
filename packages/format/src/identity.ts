@@ -69,11 +69,14 @@ export function findDuplicateIds(root: Node): Map<string, Element[]> {
 export function diagnoseIdentity(root: Node): Diagnostic[] {
   const diagnostics: Diagnostic[] = [];
 
+  // Spec section 6 says an editable block object MUST carry a stable id. Every
+  // semantic operation addresses documents through these, so a block without
+  // one is unreachable - an error, not a style note.
   for (const element of findUnidentified(root)) {
     diagnostics.push({
-      severity: "warning",
+      severity: "error",
       code: "missing-stable-id",
-      message: `<${element.tagName}> is an editable block object and should carry ${ID_ATTR}.`,
+      message: `<${element.tagName}> is an editable block object and must carry ${ID_ATTR}.`,
     });
   }
 

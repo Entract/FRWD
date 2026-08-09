@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { FrwdDocument, canonicalizeAttributes, serializeDocument } from "../src/index.js";
-import { MINIMAL, WITH_ASSET } from "./fixtures.js";
+import { FrwdDocument, ID_ATTR, canonicalizeAttributes, removeAttr, serializeDocument } from "../src/index.js";
+import { DOCUMENT_ID, MINIMAL, WITH_ASSET } from "./fixtures.js";
 
 describe("FrwdDocument", () => {
   it("accepts a conforming document", () => {
@@ -67,6 +67,40 @@ describe("FrwdDocument", () => {
   it("warns when an asset id disagrees with its wrapper", () => {
     const document = FrwdDocument.parse(WITH_ASSET.replace('data-frwd-asset-id="asset-123"', 'data-frwd-asset-id="other"'));
     expect(document.diagnostics.map((d) => d.code)).toContain("asset-id-mismatch");
+  });
+});
+
+describe("validation follows the tree", () => {
+  it("notices a mutation that breaks the document", () => {
+    const document = FrwdDocument.parse(MINIMAL);
+    expect(document.isConforming).toBe(true);
+
+    const heading = document.getElementById("22222222-2222-4222-8222-222222222222");
+    removeAttr(heading!, ID_ATTR);
+
+    expect(document.isConforming).toBe(false);
+    expect(document.errors.map((error) => error.code)).toContain("missing-stable-id");
+  });
+
+  it("notices a mutation that fixes the document", () => {
+    const document = FrwdDocument.parse(MINIMAL.replace('"format": "frwd"', '"format": "docx"'));
+    expect(document.errors.map((error) => error.code)).toContain("manifest-bad-format");
+
+    document.manifest = {
+      format: "frwd",
+      version: "0.1",
+      documentId: DOCUMENT_ID,
+      title: "Minimal FRWD",
+      created: "2026-08-09T09:00:00Z",
+      modified: "2026-08-09T09:00:00Z",
+    };
+
+    expect(document.isConforming).toBe(true);
+  });
+
+  it("gives the same answer from validate() and the diagnostics getter", () => {
+    const document = FrwdDocument.parse(WITH_ASSET);
+    expect(document.diagnostics).toEqual(document.validate());
   });
 });
 
