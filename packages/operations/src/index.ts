@@ -25,6 +25,8 @@ export { apply, commitPrepared, currentRevision, preview, PROTOCOL, PROTOCOL_VER
 
 export { readThemeToken, setThemeToken } from "./theme.js";
 
+export { readStyleProperties, readStyleProperty, removeStyleProperty, setStyleProperty } from "./style.js";
+
 export type {
   ApplyOptions,
   CommitResult,
@@ -39,7 +41,9 @@ export type {
   PreparedTransaction,
   ReplaceNodeOperation,
   ReplaceTextOperation,
+  RemoveStylePropertyOperation,
   SetAttributeOperation,
+  SetStylePropertyOperation,
   SetThemeTokenOperation,
   ThemeScope,
   TransactionChange,

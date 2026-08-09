@@ -8,7 +8,9 @@ import {
   type Element as FrwdElement,
 } from "@frwd/format";
 import { identifiedSiblings, planInsertion } from "./core/insertion.js";
+import { classOperation, renderInspector, type InspectorTarget } from "./core/inspector.js";
 import { EditorSession } from "./core/session.js";
+import { readStyleProperties } from "@frwd/operations";
 import { mountRegion, type Region } from "./core/mount.js";
 
 /**
@@ -35,6 +37,7 @@ interface Shell {
   handle: HTMLButtonElement;
   drop: HTMLElement;
   stage: HTMLElement;
+  panel: HTMLElement;
   style: HTMLStyleElement;
   status: HTMLElement;
 }
@@ -72,11 +75,14 @@ function build(): Shell {
     </header>
     <div id="quarantine" class="chrome-quarantine" hidden></div>
     <nav class="chrome-breadcrumb" id="breadcrumb" aria-label="Selected object"></nav>
-    <main class="chrome-stage">
-      <div id="surface" class="chrome-surface"></div>
-      <button id="handle" class="chrome-handle" hidden title="Drag to reorder among siblings" aria-label="Drag to reorder">⣿</button>
-      <div id="drop" class="chrome-drop" hidden></div>
-    </main>
+    <div class="chrome-columns">
+      <main class="chrome-stage">
+        <div id="surface" class="chrome-surface"></div>
+        <button id="handle" class="chrome-handle" hidden title="Drag to reorder among siblings" aria-label="Drag to reorder">⣿</button>
+        <div id="drop" class="chrome-drop" hidden></div>
+      </main>
+      <aside class="chrome-panel" id="panel" aria-label="Properties"></aside>
+    </div>
     <footer class="chrome-status" id="status">Open a .frwd file to begin.</footer>
     <style id="document-style"></style>
   `;
@@ -89,6 +95,7 @@ function build(): Shell {
     handle: root.querySelector("#handle") as HTMLButtonElement,
     drop: root.querySelector("#drop") as HTMLElement,
     stage: root.querySelector(".chrome-stage") as HTMLElement,
+    panel: root.querySelector("#panel") as HTMLElement,
     style: root.querySelector("#document-style") as HTMLStyleElement,
     status: root.querySelector("#status") as HTMLElement,
   };
@@ -176,7 +183,70 @@ function selectBlock(id: string | null): void {
 
   renderBreadcrumb();
   positionHandle();
+  renderPanel();
 }
+
+/**
+ * Draw the properties panel for the current selection.
+ *
+ * Computed style is read from the projection because that is the only place
+ * that knows what the browser actually did with the document's stylesheet. It
+ * is evidence, not state: nothing here is written back unless the user changes
+ * a field.
+ */
+function renderPanel(): void {
+  if (!selection || !session) {
+    renderInspector(shell.panel, null, panelHandlers, true);
+    return;
+  }
+
+  const canonical = session.document.getElementById(selection.id);
+  if (!canonical) {
+    renderInspector(shell.panel, null, panelHandlers, true);
+    return;
+  }
+
+  const classes = (getAttr(canonical, "class") ?? "").trim().split(/s+/).filter(Boolean);
+  const parentLabel = selection.parentId
+    ? describeElement(session.document.getElementById(selection.parentId))
+    : null;
+
+  const target: InspectorTarget = {
+    id: selection.id,
+    element: selection.element,
+    overrides: readStyleProperties(getAttr(canonical, "style") ?? ""),
+    classes,
+    tagName: canonical.tagName.toLowerCase(),
+    parentLabel,
+  };
+
+  renderInspector(shell.panel, target, panelHandlers, session.readOnly);
+}
+
+function describeElement(element: FrwdElement | undefined): string | null {
+  if (!element) return null;
+  const tag = element.tagName.toLowerCase();
+  const first = (getAttr(element, "class") ?? "").trim().split(/s+/).filter(Boolean)[0];
+  return first ? `${tag}.${first}` : tag;
+}
+
+const panelHandlers = {
+  setProperty(property: string, value: string): void {
+    if (!selection) return;
+    runOps([{ op: "set_style_property", target: selection.id, property, value }], `Set ${property} to ${value}.`);
+  },
+  clearProperty(property: string): void {
+    if (!selection) return;
+    runOps(
+      [{ op: "remove_style_property", target: selection.id, property }],
+      `Cleared the local ${property}; the stylesheet decides again.`,
+    );
+  },
+  setClasses(classes: string[]): void {
+    if (!selection) return;
+    runOps([classOperation(selection.id, classes)], "Changed classes.");
+  },
+};
 
 /**
  * Where the selected object lives.
@@ -354,12 +424,16 @@ function escapeHtml(value: string): string {
 function runOps(operations: Parameters<EditorSession["run"]>[0], done: string): void {
   if (!session) return;
   commitRegion();
+
+  const keep = selection?.id ?? null;
   const result = session.run(operations);
   if (!result.ok) {
     say(`Refused: ${result.errors.map((error) => error.message).join(" ")}`);
     return;
   }
+
   render();
+  if (keep) selectBlock(keep);
   say(done);
 }
 

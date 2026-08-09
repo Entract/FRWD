@@ -80,6 +80,31 @@ export interface SetThemeTokenOperation {
   scope?: ThemeScope;
 }
 
+/**
+ * Set one CSS declaration on one identified element.
+ *
+ * Core because its meaning is deterministic. The judgement calls - "make this
+ * roomier", "make this two columns" - stay in the editor, which compiles them
+ * to declarations like this one.
+ *
+ * Scope is the element's own inline declaration block. Editing a shared rule
+ * would change every element the selector matches, which is a different
+ * question about intent and is deliberately not answered here.
+ */
+export interface SetStylePropertyOperation {
+  op: "set_style_property";
+  target: string;
+  property: string;
+  value: string;
+}
+
+/** Remove a local override, handing the property back to the stylesheet. */
+export interface RemoveStylePropertyOperation {
+  op: "remove_style_property";
+  target: string;
+  property: string;
+}
+
 export type Operation =
   | ReplaceTextOperation
   | ReplaceNodeOperation
@@ -87,7 +112,9 @@ export type Operation =
   | DeleteNodeOperation
   | MoveNodeOperation
   | SetAttributeOperation
-  | SetThemeTokenOperation;
+  | SetThemeTokenOperation
+  | SetStylePropertyOperation
+  | RemoveStylePropertyOperation;
 
 export interface Constraints {
   /** Reject anything that changes what the document says. */

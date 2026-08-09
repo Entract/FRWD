@@ -68,6 +68,18 @@ It is an **editor tool**, not a FRWD operation: it decides intent and compiles t
 
 **Dragging reorders siblings within one parent**, committed through `move_node`. Deliberately narrow: a drag cannot produce an arrangement the document could not already express, and there are no coordinates anywhere. Dragging outside the parent is refused and snaps back rather than guessed at. The thing being dragged is a projection; the thing being moved is the document.
 
+## The properties panel
+
+Adjusting the selected object: spacing, size and alignment, appearance, its classes, and - when the object is already a grid or flex container - a contextual layout section.
+
+It is meant to feel like editing **this object**, not editing CSS source. Someone thinks "make this card roomier" or "make this section two columns"; the editor turns that into a deterministic declaration and sends it through `set_style_property`. A columns control that writes `repeat(2, 1fr)` is an editor convenience - `columns: 3` is not, and must not become, a FRWD operation.
+
+**Computed style is evidence, never state.** `getComputedStyle` is the only honest way to show a value that came from a stylesheet rule, so the panel reads it - and shows it as a placeholder. Each field says whether the value is *from rule* or *local*, and a local one can be cleared, handing the property back to the document's stylesheet. Clearing the last declaration removes the `style` attribute rather than leaving `style=""`, so an object that has had an override applied and cleared is byte-identical to one that never did.
+
+**Selecting is not editing.** Opening the panel on an object copies nothing into it; a test asserts the source is unchanged after selecting three different objects.
+
+Three levels stay distinct, and the tests hold the line: `set_theme_token` for document-wide tokens, the existing attribute operation for document-defined classes, and `set_style_property` for a deliberate local override. Editing shared rules like `.card` is out of scope - changing one affects every card, which is a different question about intent.
+
 ## Read-only is a session property
 
 A file that does not open as a conforming native FRWD is displayed, diagnosed and quarantined. Not partly: no region mounts, no text is editable, no formatting applies, no operation runs, and it cannot be saved over as though it were native. Opening a `.frwd.html` publication lands here, because a publication carries the runtime and a native FRWD carries no script.

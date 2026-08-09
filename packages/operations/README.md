@@ -99,6 +99,8 @@ attribute; it is what every other operation addresses.
 | `move_node` | Relocate a node, keeping its identity. Not inside itself. |
 | `set_attribute` | Set or remove one attribute. |
 | `set_theme_token` | Set a CSS custom property in the document stylesheet. |
+| `set_style_property` | Set one CSS declaration on one identified element. |
+| `remove_style_property` | Remove a local override, handing the property back to the stylesheet. |
 
 ### `set_theme_token`, and what is deliberately not here
 
@@ -124,6 +126,18 @@ to define, not format concepts, and `set_attribute` on `class` already reaches
 them. A high-level `set_figure_variant()` belongs in an editor that can read
 which variants a given document actually defines, and compiles to
 `set_attribute`.
+
+### `set_style_property` is one declaration on one element
+
+```json
+{ "op": "set_style_property", "target": "card-uuid", "property": "padding", "value": "6mm" }
+```
+
+Core rather than a tool, because the meaning is deterministic: two conforming implementations must agree what "set `padding` to `6mm` on element Z" does. `make_this_card_roomier` is the same idea with a judgement attached, and judgement belongs in an editor.
+
+Scope is the element's own declaration block. Editing a shared rule such as `.card` would change every card, which is a different question about intent and is deliberately not answered here.
+
+The block is **parsed as CSS, never patched as a string** — that is how unrelated declarations survive and how a value containing a semicolon fails loudly instead of quietly becoming two declarations. The result must still clear the CSS safety profile, so a declaration cannot smuggle a remote reference into a document. Removing the last declaration removes the attribute rather than leaving `style=""` behind.
 
 ### `replace_text` is deliberately blunt
 

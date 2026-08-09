@@ -53,7 +53,7 @@
       "id": "t-026",
       "title": "Contextual block editing and direct manipulation",
       "description": "Make the document feel structurally editable rather than adding more toolbar commands, and establish the selection and container model the later style/layout inspector will depend on. A real editor selection model distinguishing the selected FRWD object, the active text region, the object parent and its position among siblings - all editor state, never written into the canonical tree. Contextual insertion that reasons from the actual semantic parent: a sibling paragraph in ordinary flow, another li inside a list, content staying inside the card or section it belongs to, and a refusal with an explanation where the context is genuinely ambiguous, with no fixture class names hard-coded and new ids minted through one shared path rather than inferred from the shape of existing ones. This is an editor tool compiling to existing structural operations, not a new normative FRWD operation. Direct reordering by dragging a handle, deliberately narrow: identified sibling blocks within one parent, committed through move_node, with cross-container drags refused rather than guessed - drag changes semantic order in flow, it does not turn a flowing document into a canvas. A minimal breadcrumb so nested selection is understandable. Shell end-to-end coverage through the real UI for contextual insertion in flow and list contexts, drag reorder with the id travelling and undo/redo, nested selection, and a save that re-parses conforming and inside the safety profile. Not in scope: cross-parent dragging, pixel positioning, spacing or property panels, CSS editing, page/flow modes, AI panel, multi-block text selection.",
-      "status": "in-progress",
+      "status": "done",
       "dependsOn": [],
       "assignee": "claude",
       "category": "feature",
@@ -62,8 +62,25 @@
         "tests/editor"
       ],
       "canParallelize": false,
-      "planDoc": "07_EDITOR_ARCHITECTURE.md"
+      "planDoc": "07_EDITOR_ARCHITECTURE.md",
+      "completedCommit": "bb07155bfc7b0d6e15bffc0c4a2ca368764d198a"
+    },
+    {
+      "id": "t-027",
+      "title": "Selected-object style and layout inspector",
+      "description": "Make the visual document directly adjustable without turning FRWD into a canvas or letting the editor rewrite arbitrary stylesheet text. Adds two core operations, set_style_property and remove_style_property, editing exactly one identified element inline declaration block through a real CSS declaration model rather than string surgery: unrelated declarations preserved, staged and atomic and prepared-transaction compatible, unsafe values refused rather than sanitized, styleLocked rejects and contentLocked permits, and the change record names target, property and value. They are core because their meaning is deterministic - two implementations must agree what setting property X to value Y on element Z means - while make_card_prettier and make_three_columns stay editor tools. Three styling levels stay distinct: set_theme_token for document-wide tokens, document-defined classes through the existing attribute operation with no FRWD enum of variant names, and the new operation for deliberate local overrides. Shared CSS selector rules are explicitly out of scope, because changing one affects many objects and raises a different scope question. Adds a properties sidebar for the current selection covering spacing, sizing and alignment, contextual grid columns and gap, a small appearance set, and the element class list, distinguishing an inherited or rule-derived value from a local override and offering a way to clear one. getComputedStyle is read-only evidence about what rendered; the canonical state stays the FRWD DOM and its CSS, and selecting an object with no edit stays a no-op. No fixture class names anywhere. Not in scope: shared rule editing, stylesheet source editing, free positioning, breakpoint editor, page size, page/flow modes, AI panel, importer, collaboration.",
+      "status": "in-progress",
+      "dependsOn": [],
+      "assignee": "claude",
+      "category": "feature",
+      "affectedPaths": [
+        "packages/operations/src",
+        "apps/editor/src",
+        "tests/editor"
+      ],
+      "canParallelize": false,
+      "planDoc": "06_AI_NATIVE_EDITING_PROTOCOL.md"
     }
   ],
-  "nextId": 27
+  "nextId": 28
 }

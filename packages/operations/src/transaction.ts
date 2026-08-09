@@ -27,6 +27,7 @@ import {
   replaceNode,
   takeChildren,
 } from "./tree.js";
+import { isStyleEditFailure, removeStyleProperty, setStyleProperty } from "./style.js";
 import { isThemeEditFailure, setThemeToken } from "./theme.js";
 import type {
   ApplyOptions,
@@ -35,6 +36,8 @@ import type {
   Operation,
   OperationEnvelope,
   PreparedTransaction,
+  RemoveStylePropertyOperation,
+  SetStylePropertyOperation,
   SetThemeTokenOperation,
   TransactionChange,
   TransactionResult,
@@ -312,6 +315,8 @@ function validateEnvelope(document: FrwdDocument, envelope: OperationEnvelope): 
 function checkConstraints(operation: Operation, constraints: Constraints, index: number): Diagnostic[] {
   const presentational =
     operation.op === "set_theme_token" ||
+    operation.op === "set_style_property" ||
+    operation.op === "remove_style_property" ||
     (operation.op === "set_attribute" && PRESENTATIONAL_ATTRIBUTES.has(operation.name.toLowerCase()));
 
   if (constraints.contentLocked === true && !presentational) {
@@ -479,6 +484,10 @@ function applyOperation(
       };
     }
 
+    case "set_style_property":
+    case "remove_style_property":
+      return applyStyleProperty(element, operation, index);
+
     case "set_attribute": {
       const name = operation.name.toLowerCase();
       if (name === ID_ATTR) {
@@ -558,6 +567,45 @@ function applyThemeToken(staged: FrwdDocument, operation: SetThemeTokenOperation
       op: operation.op,
       target: operation.name,
       summary: `Set ${operation.name} to ${operation.value} in the ${scope} theme; ${detail}.`,
+    },
+  };
+}
+
+/**
+ * Change one declaration on one element.
+ *
+ * The element keeps its identity and every unrelated declaration; only the
+ * named property moves. Removing the last declaration removes the attribute
+ * rather than leaving `style=""` behind, so a document that has had a local
+ * override applied and cleared is byte-identical to one that never did.
+ */
+function applyStyleProperty(
+  element: Element,
+  operation: SetStylePropertyOperation | RemoveStylePropertyOperation,
+  index: number,
+): Outcome {
+  const current = getAttr(element, "style") ?? "";
+  const result =
+    operation.op === "set_style_property"
+      ? setStyleProperty(current, operation.property, operation.value)
+      : removeStyleProperty(current, operation.property);
+
+  if (isStyleEditFailure(result)) {
+    return { error: { severity: "error", code: result.code, message: `Operation ${index}: ${result.message}` } };
+  }
+
+  if (result.style === "") removeAttr(element, "style");
+  else setAttr(element, "style", result.style);
+
+  const was = result.previous === undefined ? "" : ` (was ${result.previous})`;
+  return {
+    change: {
+      op: operation.op,
+      target: operation.target,
+      summary:
+        operation.op === "set_style_property"
+          ? `Set ${operation.property} to ${operation.value} on <${element.tagName}>${was}.`
+          : `Removed the local ${operation.property} override from <${element.tagName}>${was}.`,
     },
   };
 }
