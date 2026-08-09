@@ -29,7 +29,7 @@
       "id": "t-002",
       "title": "packages/format - parse, serialize and stable object identity",
       "description": "Framework-agnostic TypeScript package that reads and writes a .frwd document as semantic HTML. Provides: document parse into an in-memory view, stable data-frwd-id assignment and preservation, metadata block read/write, CSS/theme and embedded asset handling, deterministic serialization. Acceptance is semantic round-trip stability: a no-op open/save preserves document identity, all stable ids, semantic structure, content, CSS, metadata and embedded assets. Serialization must be deterministic (same input produces same bytes), but exact original whitespace and attribute formatting are NOT format invariants. No editor or UI framework dependencies.",
-      "status": "pending",
+      "status": "in-progress",
       "dependsOn": [
         "t-001"
       ],
@@ -179,7 +179,8 @@
       "id": "t-011",
       "title": "Correct copyright holder and split trademark policy into TRADEMARKS.md",
       "description": "Set the copyright line to 'Copyright 2026 Guy Monroe Entract'. Reduce NOTICE to actual copyright and attribution notices only, and move the FRWD name/logo policy into a dedicated root TRADEMARKS.md stating that Apache-2.0 licenses the code and specification but grants no rights to use the FRWD name or logo in a way implying official status, certification or endorsement, while factual statements that software implements FRWD are permitted. Update the references in README.md and 00_START_HERE.md. Lands before the first push so nothing incorrect is ever published.",
-      "status": "in-progress",
+      "status": "done",
+      "completedCommit": "b025163b3dbb7776a6e10e9aa6c471b2e27fc822",
       "dependsOn": [],
       "assignee": "claude",
       "category": "github",

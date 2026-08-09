@@ -5,5 +5,5 @@
     "types": ["node"]
   },
   "files": [],
-  "references": []
+  "references": [{ "path": "./packages/format" }, { "path": "./tsconfig.tests.json" }]
 }

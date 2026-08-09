@@ -5,6 +5,7 @@ node_modules/
 # Build output
 dist/
 build/
+.tsbuild/
 *.tsbuildinfo
 
 # Test and coverage output
@@ -29,11 +30,6 @@ Thumbs.db
 # Alepou working machinery.
 # The FRWD design pack under plan/docs/ is tracked deliberately - it is the
 # authoritative design and specification source for this project.
-plan/.runtime/
+plan/.*
 plan/sessions/
 plan/chat-archives/
-plan/.outbox/
-plan/.init-packet.md
-plan/.planner-inbox.md
-plan/.planner-turn.md
-plan/.planner-session.json

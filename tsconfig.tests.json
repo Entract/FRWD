@@ -1,0 +1,17 @@
+{
+  "//": "Typechecks everything the build projects exclude: test files and root tooling config. Emits to a throwaway directory because a composite project must emit.",
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "outDir": ".tsbuild/tests",
+    "types": ["node"]
+  },
+  "include": [
+    "packages/*/test/**/*.ts",
+    "packages/*/src/**/*.test.ts",
+    "tests/**/*.ts",
+    "vitest.config.ts",
+    "playwright.config.ts"
+  ],
+  "references": [{ "path": "./packages/format" }]
+}
