@@ -38,16 +38,25 @@ embedded assets.
 time. Parsing normalizes a document once; every save after that is byte
 identical.
 
-Exact original whitespace and attribute formatting are **not** format
-invariants. Two things follow:
+## Reference canonical serialization
+
+The byte layout this package emits is **reference canonical serialization** —
+a property of this implementation, not a conformance rule (spec §21).
 
 - *Attributes are sorted* — `data-frwd-id` first, then alphabetically. HTML
   treats attribute order as meaningless; diffs do not.
 - *Markup is never reindented.* Whitespace in flow content is significant, so
-  pretty-printing would change how the document renders. Text nodes come out
-  exactly as they went in — including the absence of a trailing newline, since
-  text after `</html>` is parsed into `<body>` and a cosmetic newline would
-  otherwise grow the document on every save.
+  pretty-printing would change how the document renders. Text comes out exactly
+  as it went in.
+- *Output ends where the document ends*, with no trailing newline, because text
+  after `</html>` is parsed into `<body>` and a cosmetic newline would grow the
+  document on every save.
+
+None of that is required of other FRWD writers. A document that satisfies the
+semantic spec conforms whether or not its bytes match ours, and this package
+reads it either way. These rules exist so a no-op save produces no diff, so
+documents diff meaningfully in version control, and so fixtures can be stored as
+exact expected bytes — and they may change without changing what conforms.
 
 ## Design notes
 

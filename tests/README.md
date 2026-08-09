@@ -3,7 +3,7 @@
 | Suite | Runner | Covers |
 |---|---|---|
 | `harness/` | — | Fixture discovery shared by the suites below. Not a suite itself. |
-| `conformance/` | Vitest | Every fixture against the format spec: conformance verdict, exact diagnostics, canonical storage. |
+| `conformance/` | Vitest | Every fixture against the format spec: conformance verdict and exact diagnostics, plus — for fixtures marked canonical — that the stored bytes match reference canonical serialization. |
 | `roundtrip/` | Vitest | Semantic round-trip stability and deterministic serialization across the fixture corpus. |
 | `security/` | Vitest | The native no-script profile against known injection vectors. Arrives with `t-004`. |
 | `browser/` | Playwright | Published `.frwd.html` in Chromium, Firefox and WebKit — offline, and with JavaScript disabled. Arrives with `t-007`. |

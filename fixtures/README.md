@@ -35,9 +35,9 @@ document should produce, so each defective fixture isolates one defect.
 
 ## Canonical form
 
-Fixtures are stored exactly as the serializer would write them, which lets the
-harness assert the format's central promise — a no-op open/save produces no
-diff — against a real file rather than a string in a test.
+Fixtures with `"canonical": true` are stored exactly as `@frwd/format` would
+write them, which lets the harness assert a no-op open/save produces no diff
+against a real file rather than a string in a test.
 
 After hand-editing a fixture:
 
@@ -48,6 +48,11 @@ pnpm fixtures:canonicalize
 Note that a canonical `.frwd` file ends at `</html>` with no trailing newline.
 Text after `</html>` is not outside the document — the HTML5 parser moves it
 into `<body>` — so a cosmetic newline would become document content.
+
+This is **reference canonical serialization**, not a conformance rule: it
+constrains our fixtures and our writer, not FRWD documents in general. A
+document produced elsewhere with different attribute order or indentation is
+just as conforming, and would carry `"canonical": false`. See spec §21.
 
 ## The corpus
 

@@ -46,7 +46,8 @@
       "id": "t-003",
       "title": "fixtures/minimal + conformance harness",
       "description": "Land the minimal reference fixture and the conformance test harness that runs fixtures against packages/format. The harness must assert semantic round-trip stability and deterministic serialization, and be structured so new fixtures are cheap to add. This lands before sanitize/operations per the design pack instruction to write conformance fixtures early.",
-      "status": "in-progress",
+      "status": "done",
+      "completedCommit": "3dcfd5f543eb5ffea0c0b5cbb5ddb56411f52bac",
       "dependsOn": [
         "t-002"
       ],
@@ -227,6 +228,26 @@
       "canParallelize": true,
       "planDoc": "01_PRODUCT_VISION.md"
     }
+    {
+      "id": "t-014",
+      "title": "Normative doctype, and separate conformance from reference serialization",
+      "description": "Two conformance-semantics corrections. First, the HTML5 doctype becomes normative: FRWD depends on predictable standards-mode rendering, so quirks mode is not conforming FRWD even though the content remains recoverable. Raise missing-doctype from warning to error, add the MUST to the format spec, and flip the missing-doctype fixture to non-conforming. Second, stop presenting the reference serializer's byte output as a conformance rule. Deterministic canonical output - attribute ordering, no trailing newline, no reindentation - is REFERENCE CANONICAL SERIALIZATION produced by @frwd/format, not a requirement on FRWD writers. A third-party writer may emit semantically equivalent valid FRWD without matching our bytes. The fixture corpus may require both where canonical is true, because it tests the reference implementation; external documents need only satisfy the semantic spec. Add a spec section stating the distinction and correct the wording in the package, fixtures and tests READMEs.",
+      "status": "in-progress",
+      "dependsOn": [],
+      "assignee": "claude",
+      "category": "feature",
+      "affectedPaths": [
+        "packages/format/src/document.ts",
+        "packages/format/README.md",
+        "plan/docs/02_FRWD_FORMAT_SPEC_V0_1.md",
+        "plan/docs/FRWD_MASTER_DESIGN_SPEC.md",
+        "fixtures/invalid/missing-doctype.json",
+        "fixtures/README.md",
+        "tests/README.md"
+      ],
+      "canParallelize": false,
+      "planDoc": "02_FRWD_FORMAT_SPEC_V0_1.md"
+    }
   ],
-  "nextId": 14
+  "nextId": 15
 }

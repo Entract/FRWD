@@ -20,9 +20,12 @@ export interface FixtureExpectations {
   /** Whether the document should report itself structurally conforming. */
   conforming: boolean;
   /**
-   * Whether the file on disk is already what the serializer would write. True
-   * for every fixture we control; the flag exists for documents captured from
-   * elsewhere.
+   * Whether the file on disk already matches reference canonical serialization.
+   *
+   * True for every fixture we author. It is a property of `@frwd/format`'s
+   * writer, not a conformance rule (spec section 21) - a document produced
+   * elsewhere with different attribute order or indentation is equally
+   * conforming and would carry false here.
    */
   canonical: boolean;
   /** Exact set of distinct diagnostic codes the document should produce. */

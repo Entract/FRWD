@@ -591,6 +591,16 @@ The publication profile:
 
 `script[type="application/frwd+json"]` is non-executable data and MUST NOT contain JavaScript.
 
+### 3.1 Doctype
+
+A native FRWD document MUST begin with the HTML5 doctype:
+
+```html
+<!doctype html>
+```
+
+FRWD depends on predictable standards-mode HTML and CSS rendering. Layout, pagination and print behavior are all specified against it. A document that puts a browser into quirks mode is therefore not conforming FRWD, even though its content remains fully recoverable.
+
 ## 4. Canonical representation
 
 The canonical document tree is the HTML inside:
@@ -893,6 +903,26 @@ Because the native file uses HTML syntax, its content should remain intelligible
 A raw `.frwd` renamed to `.html` SHOULD render its baseline static content, although advanced FRWD behavior may be absent.
 
 This is a design property, not the primary user workflow.
+
+## 21. Conformance and reference canonical serialization
+
+These are two different things and must not be confused.
+
+### 21.1 FRWD conformance
+
+Conformance is **semantic**. A document conforms if it satisfies the requirements in this specification: the doctype, the version marker, the manifest, the document root, stable identifiers, the safe native profile, self-containment, and the rest.
+
+Conformance says nothing about byte layout. Any writer may produce a conforming FRWD in whatever formatting it likes: its own attribute order, its own indentation, its own line endings. Two files that differ only in such details are equally conforming, and a conforming reader MUST accept both.
+
+### 21.2 Reference canonical serialization
+
+The reference implementation, `@frwd/format`, additionally defines a **canonical serialization**: a single deterministic byte representation for a given document tree.
+
+At the time of writing it means attributes sorted with `data-frwd-id` first then alphabetically, text preserved exactly with no reindentation, and output ending precisely where the document ends.
+
+Canonical serialization exists so that a no-op open/save produces no diff, so that documents diff meaningfully in version control, and so that the conformance fixtures can be stored as exact expected bytes.
+
+It is a property of the reference implementation, not a requirement on FRWD writers. A third-party writer that emits semantically equivalent, conforming FRWD is conforming whether or not its bytes match ours. The rules of canonical serialization may change without changing what conforms.
 
 <!-- END 02_FRWD_FORMAT_SPEC_V0_1.md -->
 

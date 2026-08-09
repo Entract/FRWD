@@ -34,9 +34,12 @@ describe("FrwdDocument", () => {
     expect(major.diagnostics.find((d) => d.code === "version-mismatch")?.severity).toBe("error");
   });
 
-  it("warns about a quirks-mode document", () => {
+  it("rejects a quirks-mode document", () => {
+    // Normative: FRWD's layout and pagination are specified against
+    // standards-mode rendering, so quirks mode does not conform.
     const document = FrwdDocument.parse(MINIMAL.replace("<!doctype html>\n", ""));
-    expect(document.diagnostics.map((d) => d.code)).toContain("missing-doctype");
+    expect(document.errors.map((error) => error.code)).toContain("missing-doctype");
+    expect(document.isConforming).toBe(false);
   });
 
   it("warns about an id outside the document root", () => {

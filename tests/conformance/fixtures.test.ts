@@ -38,10 +38,10 @@ for (const fixture of fixtures) {
     });
 
     if (fixture.expectations.canonical) {
-      it("is stored in canonical form, so a no-op save produces no diff", () => {
-        // The central promise of the format, checked against a real file on
-        // disk rather than a string in a test. Regenerate with
-        // `node scripts/make-fixtures.mjs` if this fails after an edit.
+      it("matches reference canonical serialization, so a no-op save produces no diff", () => {
+        // A property of our writer rather than of FRWD (spec section 21),
+        // checked against a real file on disk rather than a string in a test.
+        // Run `pnpm fixtures:canonicalize` if this fails after an edit.
         expect(FrwdDocument.parse(fixture.source).toHtml()).toBe(fixture.source);
       });
     }

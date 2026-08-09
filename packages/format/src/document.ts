@@ -177,12 +177,15 @@ function findDocumentRoot(tree: Document): Element | undefined {
 function diagnose(tree: Document): Diagnostic[] {
   const diagnostics: Diagnostic[] = [];
 
+  // Normative. FRWD's layout and pagination rest on predictable standards-mode
+  // rendering, so a document that lands a browser in quirks mode does not
+  // conform - even though its content is perfectly recoverable.
   const doctype = tree.childNodes.find((node) => node.nodeName === "#documentType");
   if (!doctype) {
     diagnostics.push({
-      severity: "warning",
+      severity: "error",
       code: "missing-doctype",
-      message: "Document has no <!doctype html>; browsers will render it in quirks mode.",
+      message: "Document has no <!doctype html>; browsers would render it in quirks mode.",
     });
   }
 
