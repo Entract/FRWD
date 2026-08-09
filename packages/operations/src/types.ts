@@ -106,6 +106,39 @@ export interface TransactionResult {
   changes: TransactionChange[];
 }
 
+/**
+ * A transaction that has been worked out in full but not committed.
+ *
+ * `staged` is the finished document, metadata included: the revision and
+ * `modified` timestamp it carries are the ones it will have after commit. That
+ * is the point - what a reviewer reads is what lands, down to the identifiers
+ * minted for nodes that arrived without one.
+ *
+ * The remaining fields exist so `commitPrepared` can establish that the
+ * document it is about to overwrite is still the one this was prepared from.
+ */
+export interface PreparedTransaction extends TransactionResult {
+  /** Document this was prepared from. */
+  documentId: string | undefined;
+  /** Revision the live document was at when this was prepared. */
+  baseRevision: number | undefined;
+  /**
+   * Exact serialization of the live document at preparation time.
+   *
+   * Kept verbatim rather than hashed: preparation already serializes the
+   * document to make the staged copy, so the string is free, and an exact
+   * comparison cannot collide.
+   */
+  baseSource: string;
+}
+
+export interface CommitResult {
+  ok: boolean;
+  errors: Diagnostic[];
+  /** Revision the document carries after a successful commit. */
+  revision?: number;
+}
+
 export interface ApplyOptions {
   /** Timestamp written to `modified` on commit. Injectable for tests. */
   now?: Date;

@@ -21,10 +21,11 @@
  * ```
  */
 
-export { apply, currentRevision, preview, PROTOCOL, PROTOCOL_VERSION } from "./transaction.js";
+export { apply, commitPrepared, currentRevision, preview, PROTOCOL, PROTOCOL_VERSION } from "./transaction.js";
 
 export type {
   ApplyOptions,
+  CommitResult,
   Constraints,
   DeleteNodeOperation,
   Diagnostic,
@@ -33,6 +34,7 @@ export type {
   Operation,
   OperationEnvelope,
   Position,
+  PreparedTransaction,
   ReplaceNodeOperation,
   ReplaceTextOperation,
   SetAttributeOperation,

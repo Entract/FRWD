@@ -29,9 +29,11 @@ import {
 } from "./tree.js";
 import type {
   ApplyOptions,
+  CommitResult,
   Constraints,
   Operation,
   OperationEnvelope,
+  PreparedTransaction,
   TransactionChange,
   TransactionResult,
 } from "./types.js";
@@ -56,22 +58,97 @@ export function currentRevision(document: FrwdDocument): number | undefined {
 }
 
 /**
- * Compute the result of a transaction without touching anything.
+ * Work out a transaction in full without touching anything.
  *
- * Strictly non-mutating, including on the document passed in. The staged
- * document that comes back is a separate object; the caller may inspect it,
- * diff it, show it, and throw it away.
+ * Strictly non-mutating, including of the document passed in. What comes back
+ * is the finished document - metadata included - not a sketch of it: the
+ * revision, the `modified` timestamp and any identifiers minted for nodes that
+ * arrived without one are all settled here. Hand the result to
+ * `commitPrepared` and exactly what was reviewed is what lands.
  */
 export function preview(
   document: FrwdDocument,
   envelope: OperationEnvelope,
   options: ApplyOptions = {},
-): TransactionResult {
+): PreparedTransaction {
   return run(document, envelope, options);
 }
 
 /**
- * Apply a transaction.
+ * Commit a transaction that was already prepared.
+ *
+ * Never reruns the operations. Rerunning would mint different identifiers and
+ * stamp a different `modified` time, so the document that committed would not
+ * be the document anyone reviewed - and in an AI editing protocol, review is
+ * the whole safeguard.
+ *
+ * Refuses if the live document is no longer the one this was prepared from: a
+ * different document, a different revision, or the same revision with different
+ * content. Applying a decision made about an old state to a new one is worse
+ * than refusing, because nobody would find out.
+ */
+export function commitPrepared(document: FrwdDocument, prepared: PreparedTransaction): CommitResult {
+  if (!prepared.ok || !prepared.staged) {
+    return {
+      ok: false,
+      errors: [
+        {
+          severity: "error",
+          code: "not-committable",
+          message: "This transaction was rejected during preparation and cannot be committed.",
+        },
+      ],
+    };
+  }
+
+  const documentId = document.documentId;
+  if (documentId !== prepared.documentId) {
+    return {
+      ok: false,
+      errors: [
+        {
+          severity: "error",
+          code: "document-id-mismatch",
+          message: `Prepared against document ${prepared.documentId}, but this document is ${documentId}.`,
+        },
+      ],
+    };
+  }
+
+  const revision = currentRevision(document);
+  if (revision !== prepared.baseRevision) {
+    return {
+      ok: false,
+      errors: [
+        {
+          severity: "error",
+          code: "stale-revision",
+          message: `Prepared against revision ${prepared.baseRevision}; the document is now at revision ${revision}.`,
+        },
+      ],
+    };
+  }
+
+  if (document.toHtml() !== prepared.baseSource) {
+    return {
+      ok: false,
+      errors: [
+        {
+          severity: "error",
+          code: "document-changed",
+          message:
+            "The document changed after this transaction was prepared. Preview it again so the result you review is the result that commits.",
+        },
+      ],
+    };
+  }
+
+  adoptTree(document, prepared.staged);
+  return { ok: true, errors: [], ...(prepared.revision === undefined ? {} : { revision: prepared.revision }) };
+}
+
+/**
+ * Prepare and commit in one call, for callers that do not need to review first.
  *
  * Operations are applied to a staged copy of the document, never optimistically
  * to the live tree with a rollback afterwards - a rollback is only as good as
@@ -87,36 +164,56 @@ export function apply(
   envelope: OperationEnvelope,
   options: ApplyOptions = {},
 ): TransactionResult {
-  const result = run(document, envelope, options);
-  if (result.ok && result.staged) adoptTree(document, result.staged);
-  return result;
+  const prepared = preview(document, envelope, options);
+  if (!prepared.ok) return prepared;
+
+  const committed = commitPrepared(document, prepared);
+  if (committed.ok) return prepared;
+
+  return {
+    ok: false,
+    errors: committed.errors,
+    changes: prepared.changes,
+    ...(prepared.staged === undefined ? {} : { staged: prepared.staged }),
+  };
 }
 
 function run(
   document: FrwdDocument,
   envelope: OperationEnvelope,
   options: ApplyOptions,
-): TransactionResult {
+): PreparedTransaction {
   const changes: TransactionChange[] = [];
 
+  // Serializing once here does double duty: it is the deep copy that becomes
+  // the staged document, and the exact record of the state this transaction
+  // was prepared against.
+  const baseSource = document.toHtml();
+  const provenance = {
+    documentId: document.documentId,
+    baseRevision: currentRevision(document),
+    baseSource,
+  };
+
   const envelopeErrors = validateEnvelope(document, envelope);
-  if (envelopeErrors.length > 0) return { ok: false, errors: envelopeErrors, changes };
+  if (envelopeErrors.length > 0) return { ok: false, errors: envelopeErrors, changes, ...provenance };
 
   const constraintErrors = envelope.operations.flatMap((operation, index) =>
     checkConstraints(operation, envelope.constraints ?? {}, index),
   );
-  if (constraintErrors.length > 0) return { ok: false, errors: constraintErrors, changes };
+  if (constraintErrors.length > 0) return { ok: false, errors: constraintErrors, changes, ...provenance };
 
-  // The staged copy. Round-tripping through the serializer is a genuine deep
-  // copy and, because serialization is idempotent, produces a document
-  // indistinguishable from the original.
-  const staged = FrwdDocument.parse(document.toHtml());
+  // Round-tripping through the serializer is a genuine deep copy and, because
+  // serialization is idempotent, produces a document indistinguishable from
+  // the original.
+  const staged = FrwdDocument.parse(baseSource);
   const root = staged.root;
   if (!root) {
     return {
       ok: false,
       errors: [{ severity: "error", code: "missing-document-root", message: "Document has no <main data-frwd-document> to edit." }],
       changes,
+      ...provenance,
     };
   }
 
@@ -129,9 +226,9 @@ function run(
     }
     if (outcome.change) changes.push(outcome.change);
   }
-  if (errors.length > 0) return { ok: false, errors, staged, changes };
+  if (errors.length > 0) return { ok: false, errors, staged, changes, ...provenance };
 
-  const revision = (currentRevision(document) ?? 0) + 1;
+  const revision = (provenance.baseRevision ?? 0) + 1;
   const manifest = staged.manifest;
   if (manifest) {
     // Exactly once, and only after every operation has succeeded.
@@ -149,9 +246,9 @@ function run(
   const structural = staged.validate();
   const profile = inspect(staged.tree, options.maxDataUrlBytes === undefined ? {} : { maxDataUrlBytes: options.maxDataUrlBytes });
   const blocking = [...structural, ...profile].filter((diagnostic) => diagnostic.severity === "error");
-  if (blocking.length > 0) return { ok: false, errors: blocking, staged, changes };
+  if (blocking.length > 0) return { ok: false, errors: blocking, staged, changes, ...provenance };
 
-  return { ok: true, errors: [], staged, revision, changes };
+  return { ok: true, errors: [], staged, revision, changes, ...provenance };
 }
 
 function validateEnvelope(document: FrwdDocument, envelope: OperationEnvelope): Diagnostic[] {

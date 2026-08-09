@@ -9,7 +9,7 @@ deliberately ordinary code: no model, no network, no vendor.
 Framework-agnostic. Depends on `@frwd/format` and `@frwd/sanitize`.
 
 ```ts
-import { apply, preview } from "@frwd/operations";
+import { apply, commitPrepared, preview } from "@frwd/operations";
 
 const envelope = {
   protocol: "frwd-ops",
@@ -20,9 +20,33 @@ const envelope = {
   operations: [{ op: "replace_text", target: "p-42", text: "Shorter." }],
 };
 
-preview(document, envelope);  // changes nothing, shows what would happen
-apply(document, envelope);    // changes nothing unless everything passes
+const prepared = preview(document, envelope);   // changes nothing
+// … show prepared.staged, prepared.changes, prepared.errors to a human …
+commitPrepared(document, prepared);             // commits exactly that
+
+apply(document, envelope);                      // prepare + commit, no review
 ```
+
+## The reviewed result is the committed result
+
+`preview` returns a **prepared transaction**: the finished document, metadata
+included. The revision, the `modified` timestamp and any identifiers minted for
+nodes that arrived without one are all settled during preparation.
+
+`commitPrepared` never reruns the operations. Rerunning would mint different
+identifiers and stamp a different time, so the document that committed would not
+be the document anyone reviewed — and in an AI editing protocol, review is the
+whole safeguard.
+
+It refuses if the live document is no longer the one the transaction was
+prepared from: a different document, a different revision, or **the same
+revision with different content** — an editor writing straight to the tree does
+not bump anything, so the revision check alone would miss it. Applying a
+decision made about an old state to a new one is worse than refusing, because
+nobody would find out.
+
+`apply` is the convenience path for callers that do not need to review: it
+prepares and immediately commits, through the same code.
 
 ## Transaction semantics
 
