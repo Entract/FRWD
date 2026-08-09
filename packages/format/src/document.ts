@@ -1,7 +1,7 @@
 import { parse, parseFragment as parse5Fragment } from "parse5";
 import { readAssets } from "./assets.js";
-import { DOCUMENT_ATTR, DOCUMENT_ID_META, FRWD_VERSION, ID_ATTR, VERSION_ATTR } from "./constants.js";
-import { findByTagName, findElement, getAttr, walkElements } from "./dom.js";
+import { DOCUMENT_ATTR, DOCUMENT_ID_META, FRWD_VERSION, ID_ATTR, VERSION_ATTR, requiresStableId } from "./constants.js";
+import { findByTagName, findElement, getAttr, hasAttr, walkElements } from "./dom.js";
 import { collectIdentified, diagnoseIdentity, ensureIds, findById } from "./identity.js";
 import { readManifest, stringifyManifest, writeManifest } from "./manifest.js";
 import { canonicalizeAttributes, serializeDocument } from "./serialize.js";
@@ -178,6 +178,45 @@ export function parseFragment(html: string, context?: Element): DocumentFragment
   return fragment;
 }
 
+/**
+ * Content a printout would lose.
+ *
+ * A closed `<details>` hides its content, and no stylesheet can reliably force
+ * one open: `::details-content` covers Chromium and Firefox, WebKit has no
+ * equivalent. So substantive content inside one silently fails to reach paper
+ * in at least one major engine, which is exactly what the rich-media print
+ * contract forbids.
+ *
+ * `<details>` remains perfectly good HTML for convenience content - an inline
+ * aside, a hint, a bit of prose the reader can take or leave. The line drawn
+ * here is block objects: once a disclosure contains something the document
+ * model treats as an editable object in its own right, it is document content,
+ * and it belongs in a `frwd-disclosure` - whose print behaviour FRWD controls -
+ * or in a `<details open>`.
+ */
+function diagnoseCollapsedContent(root: Element): Diagnostic[] {
+  const diagnostics: Diagnostic[] = [];
+
+  for (const element of walkElements(root)) {
+    if (element.tagName !== "details" || hasAttr(element, "open")) continue;
+
+    const blocks = [...walkElements(element)].filter(
+      (descendant) => descendant !== element && requiresStableId(descendant.tagName),
+    );
+    if (blocks.length === 0) continue;
+
+    const id = getAttr(element, ID_ATTR);
+    diagnostics.push({
+      severity: "error",
+      code: "collapsed-substantive-content",
+      message: `A closed <details> holds ${blocks.length} block object(s), which would not reach a printout in every browser. Use <frwd-disclosure>, or open the <details>.`,
+      ...(id === undefined ? {} : { elementId: id }),
+    });
+  }
+
+  return diagnostics;
+}
+
 function findDocumentRoot(tree: Document): Element | undefined {
   return findElement(tree, (element) => element.tagName === "main" && getAttr(element, DOCUMENT_ATTR) !== undefined);
 }
@@ -230,6 +269,7 @@ function diagnose(tree: Document): Diagnostic[] {
     });
   } else {
     diagnostics.push(...diagnoseIdentity(root));
+    diagnostics.push(...diagnoseCollapsedContent(root));
   }
 
   const { manifest, diagnostics: manifestDiagnostics } = readManifest(tree);

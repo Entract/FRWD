@@ -1,0 +1,27 @@
+<!DOCTYPE html><html data-frwd-version="0.1" lang="en"><head>
+<meta charset="utf-8">
+<meta content="b0000008-0000-4000-8000-000000000001" name="frwd-document-id">
+<title>Collapsed substantive content</title>
+<script id="frwd-manifest" type="application/frwd+json">
+{
+  "format": "frwd",
+  "version": "0.1",
+  "documentId": "b0000008-0000-4000-8000-000000000001",
+  "title": "Collapsed substantive content",
+  "created": "2026-08-09T09:00:00Z",
+  "modified": "2026-08-09T09:00:00Z"
+}
+</script>
+</head>
+<body>
+<main data-frwd-document="">
+<article data-frwd-id="b0000008-0000-4000-8000-000000000002">
+<h1 data-frwd-id="b0000008-0000-4000-8000-000000000003">Collapsed substantive content</h1>
+<details data-frwd-id="b0000008-0000-4000-8000-000000000004">
+<summary>Safety procedure</summary>
+<p data-frwd-id="b0000008-0000-4000-8000-000000000005">Isolate the supply before removing the cover.</p>
+</details>
+</article>
+</main>
+
+</body></html>

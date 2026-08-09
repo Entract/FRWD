@@ -54,7 +54,7 @@ figcaption { font-size: 0.875rem; }
 
 <details data-frwd-id="d1000000-0000-4000-8000-000000000011">
 <summary>Native disclosure</summary>
-<p data-frwd-id="d1000000-0000-4000-8000-000000000012">Standard details and summary, used where they already solve the problem.</p>
+<span>Standard details and summary, used where they already solve the problem. Convenience content only: no block object, so nothing is lost if a printout omits it.</span>
 </details>
 
 <frwd-chart data-frwd-id="d1000000-0000-4000-8000-000000000013" data-source="quarterly-revenue" data-type="bar" data-x="quarter" data-y="revenue">

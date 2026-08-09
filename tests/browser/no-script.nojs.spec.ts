@@ -42,7 +42,7 @@ test("the runtime does not install, and nothing is missing because of it", async
 test("native disclosure still opens, because the browser owns it", async ({ page }) => {
   await page.goto(COMPONENTS);
 
-  const body = page.locator("details > p");
+  const body = page.locator("details > span");
   await expect(body).toBeHidden();
 
   await page.locator("summary").click();

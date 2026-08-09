@@ -135,7 +135,7 @@
       "id": "t-008",
       "title": "Flagship designed reference document",
       "description": "The first serious product demonstration rather than a bigger fixture corpus: one designed reference document where the advantage over a normal AI-generated DOCX is obvious at first glance, while it still behaves as a genuine flowing document. Delivered fixtures/business-report/annual-review.frwd - cover, typographic system, metrics rail, hand-authored SVG chart, financial table, callout and disclosure - built only from HTML, CSS and existing FRWD primitives, with no document-type-specific format features. Browser tests put the thesis itself under test: a substantial semantic edit reflows everything after it with no width changed, the desktop rail stacks sensibly on a phone with nothing lost, and print keeps the whole document while dropping the disclosure control. The remaining designed documents are t-019.",
-      "status": "in-progress",
+      "status": "done",
       "dependsOn": [
         "t-006"
       ],
@@ -145,7 +145,8 @@
         "fixtures"
       ],
       "canParallelize": true,
-      "planDoc": "13_EXAMPLE_DOCUMENTS.md"
+      "planDoc": "13_EXAMPLE_DOCUMENTS.md",
+      "completedCommit": "b031ee16058adf16ca3d2327d359387476c29d3d"
     },
     {
       "id": "t-009",
@@ -308,7 +309,7 @@
       "id": "t-018",
       "title": "Conformance rule: substantive content must not be trapped in a closed native details",
       "description": "The cross-browser suite established that no CSS can force-expand a closed native <details> in every engine - ::details-content covers Chromium and Firefox, WebKit has no equivalent - so substantive content inside one can silently vanish from a printout. That breaks the rich-media print contract, which says no component carrying substantive content may disappear from print. Add a checkable rule rather than leaving it as guidance: report a diagnostic when a <details> without open contains substantive content, and point the author at frwd-disclosure or <details open>. Decide which layer owns it - it is a print-contract rule rather than a safety-profile one, so it probably belongs in packages/format's structural validation. Needs a fixture and, once it exists, the WebKit skip in the browser suite can be replaced by a rule that makes the situation unreachable.",
-      "status": "pending",
+      "status": "in-progress",
       "dependsOn": [],
       "assignee": "claude",
       "category": "feature",

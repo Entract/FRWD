@@ -1,0 +1,11 @@
+{
+  "title": "Collapsed substantive content",
+  "description": "A block object inside a closed <details>. No stylesheet can force one open in every engine, so this content would be missing from a printout in WebKit - which the rich-media print contract forbids. Use frwd-disclosure, or open the details.",
+  "conforming": false,
+  "canonical": true,
+  "expectedDiagnostics": [
+    "collapsed-substantive-content"
+  ],
+  "profileConforming": true,
+  "expectedProfileDiagnostics": []
+}

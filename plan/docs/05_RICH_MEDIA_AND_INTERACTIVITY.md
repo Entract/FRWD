@@ -162,6 +162,8 @@ Therefore:
 - use `<details>` freely for supplementary content the reader can take or leave;
 - put **substantive** content that must reach paper in a `frwd-disclosure`, or author the `<details>` as `<details open>`.
 
+This is checked rather than merely advised. A closed `<details>` containing a block object - anything the document model treats as an editable object in its own right - is a conformance error (`collapsed-substantive-content`). Inline convenience content inside a closed `<details>` is fine, because nothing is lost if a printout omits it.
+
 ## 9. Callout
 
 A callout is semantic supporting content:

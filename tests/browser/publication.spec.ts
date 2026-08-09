@@ -112,22 +112,6 @@ test.describe("print", () => {
     await page.emulateMedia({ media: "screen" });
     await expect(body).toBeHidden();
   });
-
-  test("exposes content collapsed in a native details, where the engine allows it", async ({ page, browserName }) => {
-    // Not a guarantee, and the suite says so rather than quietly asserting a
-    // weaker claim. No CSS can force-expand a closed <details> in every engine
-    // today: `::details-content` covers Chromium and Firefox, WebKit has
-    // neither that nor an equivalent. So substantive content belongs in a
-    // frwd-disclosure, or in <details open>. See t-018.
-    test.skip(browserName === "webkit", "WebKit cannot expand a closed <details> from CSS.");
-
-    await page.goto(COMPONENTS);
-    const body = page.locator("details > p");
-    await expect(body).toBeHidden();
-
-    await page.emulateMedia({ media: "print" });
-    await expect(body).toBeVisible();
-  });
 });
 
 test.describe("narrow viewport", () => {
