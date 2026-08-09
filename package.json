@@ -29,6 +29,8 @@
   "devDependencies": {
     "@frwd/format": "workspace:*",
     "@frwd/operations": "workspace:*",
+    "@frwd/publisher": "workspace:*",
+    "@frwd/runtime": "workspace:*",
     "@frwd/sanitize": "workspace:*",
     "@playwright/test": "^1.62.1",
     "@types/node": "^24.13.3",

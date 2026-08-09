@@ -5,5 +5,5 @@
     "types": ["node"]
   },
   "files": [],
-  "references": [{ "path": "./packages/format" }, { "path": "./packages/sanitize" }, { "path": "./packages/operations" }, { "path": "./tsconfig.tests.json" }]
+  "references": [{ "path": "./packages/format" }, { "path": "./packages/sanitize" }, { "path": "./packages/operations" }, { "path": "./packages/runtime" }, { "path": "./packages/publisher" }, { "path": "./tsconfig.tests.json" }]
 }

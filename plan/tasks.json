@@ -99,7 +99,7 @@
       "id": "t-006",
       "title": "packages/publisher + packages/runtime - .frwd.html emission",
       "description": "Publisher that emits report.frwd.html from a .frwd document, embedding the trusted standard FRWD browser runtime (edit mode hooks, safe rich interactivity, Save As, print/export helpers). The runtime is framework-agnostic and self-contained; the published file must be a single portable HTML file that works fully offline and remains readable with JavaScript disabled.",
-      "status": "pending",
+      "status": "in-progress",
       "dependsOn": [
         "t-005"
       ],
@@ -289,7 +289,8 @@
       "id": "t-017",
       "title": "Prepared transactions: the reviewed result is the committed result",
       "description": "preview() and apply() currently run the transaction independently, so rerunning the same envelope is not guaranteed to reproduce the document the user reviewed - minted stable ids and the modified timestamp both differ between runs. For an AI editing protocol the reviewed staged result must be exactly what commits. Introduce commitPrepared(document, prepared), which never reruns the operations, adopts the exact staged tree that was previewed, verifies the live document is still the same document at the same revision and otherwise unchanged since preview, and refuses rather than applying an old decision to a new state. Metadata is already written once during preparation, so the preview shows the final revision and modified value. apply() stays as a convenience and internally prepares then commits, so there is one code path. Regression test: an inserted node with no id and no injected idFactory must show the same id in preview as it has after commitPrepared.",
-      "status": "in-progress",
+      "status": "done",
+      "completedCommit": "10a753eaaca0e01ae3609cc2bf657ff400865696",
       "dependsOn": [],
       "assignee": "claude",
       "category": "feature",

@@ -1,4 +1,4 @@
-import type { Diagnostic } from "@frwd/format";
+import type { Diagnostic, Element } from "@frwd/format";
 
 export type { Diagnostic };
 
@@ -8,6 +8,15 @@ export interface InspectOptions {
    * Defaults to `DEFAULT_MAX_DATA_URL_BYTES`.
    */
   maxDataUrlBytes?: number;
+  /**
+   * Elements to skip.
+   *
+   * Exists for the publisher, which vouches for exactly one script - the
+   * trusted runtime - and needs the rest of the profile applied around it. The
+   * caller decides what it can vouch for; this package still checks everything
+   * else, including that element's descendants.
+   */
+  exempt?: ReadonlySet<Element>;
 }
 
 export type SanitizeAction =

@@ -13,5 +13,5 @@
     "vitest.config.ts",
     "playwright.config.ts"
   ],
-  "references": [{ "path": "./packages/format" }, { "path": "./packages/sanitize" }, { "path": "./packages/operations" }]
+  "references": [{ "path": "./packages/format" }, { "path": "./packages/sanitize" }, { "path": "./packages/operations" }, { "path": "./packages/runtime" }, { "path": "./packages/publisher" }]
 }

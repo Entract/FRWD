@@ -1,0 +1,25 @@
+{
+  "name": "@frwd/publisher",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Emit a .frwd.html publication: the document plus the trusted FRWD runtime, and nothing else.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc --build"
+  },
+  "dependencies": {
+    "@frwd/format": "workspace:*",
+    "@frwd/runtime": "workspace:*",
+    "@frwd/sanitize": "workspace:*"
+  }
+}

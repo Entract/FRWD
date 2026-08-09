@@ -32,6 +32,7 @@ export function inspect(root: Node, options: InspectOptions = {}): Diagnostic[] 
   };
 
   for (const element of walkElements(root)) {
+    if (options.exempt?.has(element) === true) continue;
     const tagName = element.tagName;
 
     if (tagName === "script") {
