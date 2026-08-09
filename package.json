@@ -23,9 +23,11 @@
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest",
     "test:browser": "playwright test --pass-with-no-tests",
+    "fixtures:canonicalize": "pnpm build && node scripts/canonicalize-fixtures.mjs",
     "clean": "tsc --build --clean"
   },
   "devDependencies": {
+    "@frwd/format": "workspace:*",
     "@playwright/test": "^1.62.1",
     "@types/node": "^24.13.3",
     "@vitest/coverage-v8": "^4.1.10",

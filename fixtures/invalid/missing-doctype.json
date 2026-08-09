@@ -1,0 +1,9 @@
+{
+  "title": "Missing doctype",
+  "description": "No <!doctype html>. Browsers render this in quirks mode, which changes layout - a warning rather than an error, because the content is intact.",
+  "conforming": true,
+  "canonical": true,
+  "expectedDiagnostics": [
+    "missing-doctype"
+  ]
+}

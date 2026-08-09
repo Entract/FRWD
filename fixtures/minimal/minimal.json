@@ -1,0 +1,7 @@
+{
+  "title": "Minimal FRWD",
+  "description": "The smallest document that exercises every structural rule in FRWD 0.1: manifest, document stylesheet, document root, and a stable identifier on every editable block.",
+  "conforming": true,
+  "canonical": true,
+  "expectedDiagnostics": []
+}

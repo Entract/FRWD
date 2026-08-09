@@ -1,0 +1,9 @@
+{
+  "title": "Missing stable identifier",
+  "description": "One paragraph carries no data-frwd-id. Spec section 6 makes this a MUST: a block without an identifier cannot be addressed by any semantic operation.",
+  "conforming": false,
+  "canonical": true,
+  "expectedDiagnostics": [
+    "missing-stable-id"
+  ]
+}

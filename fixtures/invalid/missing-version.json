@@ -1,0 +1,9 @@
+{
+  "title": "Missing version marker",
+  "description": "<html> carries no data-frwd-version, so nothing identifies this as a FRWD document.",
+  "conforming": false,
+  "canonical": true,
+  "expectedDiagnostics": [
+    "missing-version"
+  ]
+}

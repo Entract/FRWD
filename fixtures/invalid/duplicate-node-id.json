@@ -1,0 +1,9 @@
+{
+  "title": "Duplicate node identifier",
+  "description": "Two blocks share one identifier, so a semantic operation addressing it has no single target. Identity is the guarantee the whole stack rests on.",
+  "conforming": false,
+  "canonical": true,
+  "expectedDiagnostics": [
+    "duplicate-stable-id"
+  ]
+}

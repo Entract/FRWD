@@ -1,0 +1,9 @@
+{
+  "title": "Malformed manifest",
+  "description": "The manifest is not valid JSON. The content is still readable, which is why parsing reports instead of throwing.",
+  "conforming": false,
+  "canonical": true,
+  "expectedDiagnostics": [
+    "manifest-not-json"
+  ]
+}

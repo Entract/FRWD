@@ -1,0 +1,9 @@
+{
+  "title": "Missing document root",
+  "description": "<main> is present but carries no data-frwd-document, so the canonical document tree has no root.",
+  "conforming": false,
+  "canonical": true,
+  "expectedDiagnostics": [
+    "missing-document-root"
+  ]
+}

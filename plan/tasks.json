@@ -46,7 +46,7 @@
       "id": "t-003",
       "title": "fixtures/minimal + conformance harness",
       "description": "Land the minimal reference fixture and the conformance test harness that runs fixtures against packages/format. The harness must assert semantic round-trip stability and deterministic serialization, and be structured so new fixtures are cheap to add. This lands before sanitize/operations per the design pack instruction to write conformance fixtures early.",
-      "status": "pending",
+      "status": "in-progress",
       "dependsOn": [
         "t-002"
       ],
@@ -213,7 +213,8 @@
       "id": "t-013",
       "title": "Docs language pass: outward-facing README, durable non-goals",
       "description": "Remove conversational artefacts from the public-facing language without changing the format architecture. Rewrite README.md to be concise and outward-facing: what FRWD is, why it exists, the core architectural idea, status, and how to explore or contribute. Across the design pack, treat concrete document types (reports, CVs, manuals, papers) as examples rather than defining boundaries, and delete negatives that only make sense inside the design conversation - notably 'FRWD is not a CV maker, a presentation format, a web-page builder' and 'the CV is a useful demo, not the product definition'. Keep genuine architectural non-goals: slide or canvas layout, spreadsheet, macro or code execution environment, cloud-dependent workspace. FRWD_MASTER_DESIGN_SPEC.md consolidates the other documents and must be kept in step.",
-      "status": "in-progress",
+      "status": "done",
+      "completedCommit": "0163b4b02c2bfbdf8ec89c491f55bd6f94b128d5",
       "dependsOn": [],
       "assignee": "claude",
       "category": "github",

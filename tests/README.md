@@ -2,13 +2,15 @@
 
 | Suite | Runner | Covers |
 |---|---|---|
-| `conformance/` | Vitest | Fixtures against the format spec. |
-| `roundtrip/` | Vitest | Semantic round-trip stability and deterministic serialization. |
-| `security/` | Vitest | The native no-script profile against known injection vectors. |
-| `browser/` | Playwright | Published `.frwd.html` in Chromium, Firefox and WebKit — offline, and with JavaScript disabled. |
+| `harness/` | — | Fixture discovery shared by the suites below. Not a suite itself. |
+| `conformance/` | Vitest | Every fixture against the format spec: conformance verdict, exact diagnostics, canonical storage. |
+| `roundtrip/` | Vitest | Semantic round-trip stability and deterministic serialization across the fixture corpus. |
+| `security/` | Vitest | The native no-script profile against known injection vectors. Arrives with `t-004`. |
+| `browser/` | Playwright | Published `.frwd.html` in Chromium, Firefox and WebKit — offline, and with JavaScript disabled. Arrives with `t-007`. |
 | `visual/` | Playwright | Screen and print rendering of the designed fixtures. |
 
-Unit tests live beside the code they cover, in `packages/*/src`.
+Unit tests live beside the code they cover, in `packages/*/test`.
 
 Conformance fixtures are written early, before the editor exists — the format is
-the product, so its guarantees are tested first.
+the product, so its guarantees are tested first. Adding a fixture is two files
+under `fixtures/` and no wiring; see [`fixtures/README.md`](../fixtures/README.md).

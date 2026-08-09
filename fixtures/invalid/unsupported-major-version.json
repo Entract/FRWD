@@ -1,0 +1,9 @@
+{
+  "title": "Unsupported major version",
+  "description": "Declares FRWD 1.0. Spec section 18: an older reader meeting a newer incompatible major version must warn before saving, so this is an error rather than a warning.",
+  "conforming": false,
+  "canonical": true,
+  "expectedDiagnostics": [
+    "version-mismatch"
+  ]
+}
