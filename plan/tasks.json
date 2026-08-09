@@ -4,7 +4,8 @@
       "id": "t-001",
       "title": "Bootstrap public FRWD repo (Apache-2.0, workspace, toolchain, CI)",
       "description": "Wire the existing empty GitHub repo github.com/Entract/FRWD to this working copy and land the project definition as the first commit. Includes: Apache-2.0 LICENSE (canonical text) and NOTICE; strong public README.md; .gitignore (ignoring volatile Alepou machinery under plan/ but tracking plan/docs/); pnpm workspace (pnpm-workspace.yaml + packageManager field); TypeScript base config; Vitest config; Playwright config and browser-test skeleton; GitHub Actions CI running typecheck + unit tests; empty package/app/fixture/test directory scaffold; spec/ and docs/ placeholders with adr/. Also corrects 00_START_HERE.md sections 7-8, which wrongly place the design pack at docs/design/ and ADRs at /docs/adr/ - plan/docs/ is the authoritative home for the design pack.",
-      "status": "in-progress",
+      "status": "done",
+      "completedCommit": "887fff5f9b6b2369185a4a689b2b1f9b09b1975e",
       "dependsOn": [],
       "assignee": "claude",
       "category": "github",
@@ -143,7 +144,7 @@
     {
       "id": "t-009",
       "title": "Public-facing docs: vision, architecture, ADR log, CONTRIBUTING",
-      "description": "Write the public renditions that a visitor to the repo needs: docs/vision.md, docs/architecture.md, the first ADRs recording decisions already made (single-HTML source, no ZIP container, no arbitrary script in the native profile, toolchain), and a brief CONTRIBUTING.md. These are condensed public documents derived from the plan/docs/ design pack, not copies of it. Also decide whether to promote the normative format spec into spec/FRWD-0.1.md at that point.",
+      "description": "Write the public renditions that a visitor to the repo needs: docs/vision.md, docs/architecture.md, the first ADRs recording decisions already made (single-HTML source, no ZIP container, no arbitrary script in the native profile, toolchain), and a brief CONTRIBUTING.md. These are condensed public documents derived from the plan/docs/ design pack, not copies of it. Also define the conformance programme that TRADEMARKS.md defers, so that claims of FRWD compatibility have a published, testable standard behind them, and decide whether to promote the normative format spec into spec/FRWD-0.1.md at that point.",
       "status": "pending",
       "dependsOn": [
         "t-001"
@@ -173,7 +174,23 @@
       ],
       "canParallelize": false,
       "planDoc": "07_EDITOR_ARCHITECTURE.md"
+    },
+    {
+      "id": "t-011",
+      "title": "Correct copyright holder and split trademark policy into TRADEMARKS.md",
+      "description": "Set the copyright line to 'Copyright 2026 Guy Monroe Entract'. Reduce NOTICE to actual copyright and attribution notices only, and move the FRWD name/logo policy into a dedicated root TRADEMARKS.md stating that Apache-2.0 licenses the code and specification but grants no rights to use the FRWD name or logo in a way implying official status, certification or endorsement, while factual statements that software implements FRWD are permitted. Update the references in README.md and 00_START_HERE.md. Lands before the first push so nothing incorrect is ever published.",
+      "status": "in-progress",
+      "dependsOn": [],
+      "assignee": "claude",
+      "category": "github",
+      "affectedPaths": [
+        "NOTICE",
+        "TRADEMARKS.md",
+        "README.md",
+        "plan/docs/00_START_HERE.md"
+      ],
+      "canParallelize": false
     }
   ],
-  "nextId": 11
+  "nextId": 12
 }

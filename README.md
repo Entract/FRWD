@@ -64,7 +64,7 @@ The format is open. The reference implementation is open. Your documents belong 
 
 Everything in this repository — specification and reference implementation — is Apache-2.0. Anyone may implement FRWD, including commercially. The patent grant is deliberate: FRWD aims to be a format, not an app.
 
-The FRWD name and logo are reserved separately, so that "FRWD compatible" keeps meaning something. See [`NOTICE`](NOTICE).
+The FRWD name and logo are reserved separately, so that "FRWD compatible" keeps meaning something. You may say your software implements FRWD; you may not imply we certified it. See [`TRADEMARKS.md`](TRADEMARKS.md).
 
 ## Repository layout
 
@@ -131,4 +131,4 @@ Not yet — there is nothing meaningful to contribute to until the format packag
 
 ## License
 
-[Apache License 2.0](LICENSE). See [`NOTICE`](NOTICE) for the trademark position.
+[Apache License 2.0](LICENSE), copyright 2026 Guy Monroe Entract. See [`NOTICE`](NOTICE) for attribution and [`TRADEMARKS.md`](TRADEMARKS.md) for the name and logo policy.

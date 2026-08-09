@@ -215,7 +215,8 @@ into `spec/` only when a version is frozen.
 ```text
 frwd/
 ├─ LICENSE                Apache-2.0
-├─ NOTICE                 attribution and trademark position
+├─ NOTICE                 copyright and attribution notices
+├─ TRADEMARKS.md          FRWD name and logo policy
 ├─ plan/docs/             design pack and draft specification (authoritative)
 │  └─ adr/                architecture decision records
 ├─ spec/                  normative specification, promoted when frozen

@@ -1,5 +1,5 @@
 FRWD - Flowing Rich Web Document
-Copyright 2026 Entract
+Copyright 2026 Guy Monroe Entract
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -13,17 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
---------------------------------------------------------------------------
-Trademarks
---------------------------------------------------------------------------
+FRWD currently includes no third-party code requiring attribution. Any such
+notices will be added below as dependencies are introduced.
 
-The Apache License 2.0 grants broad rights to the source code and to the
-specification text in this repository. Anyone may implement the FRWD format,
-including commercially.
-
-The License does not grant rights in the "FRWD" name or logo. Those marks are
-reserved so that claims of FRWD compatibility, conformance or certification
-remain meaningful. You may state factually that your software reads, writes or
-implements the FRWD format. You may not use the FRWD name or logo in a way
-that suggests endorsement, official status or certification without
-permission.
+Trademarks are addressed separately in TRADEMARKS.md.
