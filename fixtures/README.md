@@ -72,10 +72,12 @@ just as conforming, and would carry `"canonical": false`. See spec §21.
 | `minimal/` | Smallest document exercising every structural rule. |
 | `invalid/` | One structural defect each: missing doctype, missing version, unsupported major version, missing document root, malformed manifest, duplicate node id, missing stable id. |
 | `security/` | Structurally valid documents that break the native safety profile: inline and remote script, event handlers, `javascript:` URLs plain and obfuscated, SVG script, meta refresh, iframe, `base`, `form`, `link`, `formaction`, `ping`, HTML data URLs, remote and relative images, `@import`, remote fonts and background images, unparseable CSS, and an oversized embedded asset. Plus `inert-dataset`, the positive control: a construct the spec requires and the profile must accept. |
+| `business-report/` | **The flagship demonstration.** A designed annual review: cover, typographic system, metrics rail, hand-authored SVG chart, financial table, callout and disclosure — all flowing semantic HTML, no document-type-specific format features. |
 | `cv/` | Planned — dense typographic layout, print fidelity. |
 | `scientific/` | Planned — equations, figures, tables, cross-references. |
-| `business-report/` | Planned — charts, data, callouts, cover design. |
 | `rich-manual/` | Planned — video, audio, galleries, interactive disclosure. |
+| `components/` | Every rich component the runtime knows, each written so its fallback reads correctly when nothing runs. |
 
-`minimal/` and `invalid/` landed with task `t-003`, `security/` with `t-004`. The
-designed set arrives with `t-008`.
+`minimal/` and `invalid/` landed with task `t-003`, `security/` and
+`components/` with `t-004` and `t-007`, and `business-report/` with `t-008`. The
+remaining designed documents arrive with `t-019`.

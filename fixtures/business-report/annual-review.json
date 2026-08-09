@@ -1,0 +1,9 @@
+{
+  "title": "Northwind Instruments — Annual Review 2026",
+  "description": "The flagship demonstration: a designed business report with a cover, a typographic system, a metrics rail, a hand-authored SVG chart, a financial table, a callout and a disclosure. Every part is flowing semantic HTML with no document-type-specific format features.",
+  "conforming": true,
+  "canonical": true,
+  "expectedDiagnostics": [],
+  "profileConforming": true,
+  "expectedProfileDiagnostics": []
+}

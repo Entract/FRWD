@@ -8,5 +8,5 @@
     "types": ["node"]
   },
   "include": ["tests/browser/**/*.ts"],
-  "references": [{ "path": "./packages/format" }, { "path": "./packages/publisher" }]
+  "references": [{ "path": "./packages/format" }, { "path": "./packages/publisher" }, { "path": "./packages/operations" }]
 }

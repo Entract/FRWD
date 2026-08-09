@@ -117,7 +117,8 @@
       "id": "t-007",
       "title": "Cross-browser Playwright suite for .frwd.html",
       "description": "Exercise publisher output against Chromium, Firefox and WebKit as soon as the publisher exists - not after the editor. Covers: offline load from file:// with no network, JavaScript-disabled readability, media playback, print stylesheet rendering, and Save As round-trip back through packages/format. Wired into CI.",
-      "status": "in-progress",
+      "status": "done",
+      "completedCommit": "4da820ea853fc369099195f07b81a3ba0447027a",
       "dependsOn": [
         "t-006"
       ],
@@ -132,9 +133,9 @@
     },
     {
       "id": "t-008",
-      "title": "Designed reference fixtures (cv, scientific, business-report, rich-manual)",
-      "description": "Build the designed reference documents as a first-class part of development, not merely as tests. These must demonstrate that FRWD produces exceptionally good-looking documents on screen and in print, and they drive requirements back into format, sanitize and publisher. Each fixture runs through the conformance harness and the cross-browser suite.",
-      "status": "pending",
+      "title": "Flagship designed reference document",
+      "description": "The first serious product demonstration rather than a bigger fixture corpus: one designed reference document where the advantage over a normal AI-generated DOCX is obvious at first glance, while it still behaves as a genuine flowing document. Delivered fixtures/business-report/annual-review.frwd - cover, typographic system, metrics rail, hand-authored SVG chart, financial table, callout and disclosure - built only from HTML, CSS and existing FRWD primitives, with no document-type-specific format features. Browser tests put the thesis itself under test: a substantial semantic edit reflows everything after it with no width changed, the desktop rail stacks sensibly on a phone with nothing lost, and print keeps the whole document while dropping the disclosure control. The remaining designed documents are t-019.",
+      "status": "in-progress",
       "dependsOn": [
         "t-006"
       ],
@@ -230,7 +231,7 @@
       ],
       "canParallelize": true,
       "planDoc": "01_PRODUCT_VISION.md"
-    }
+    },
     {
       "id": "t-014",
       "title": "Normative doctype, and separate conformance from reference serialization",
@@ -251,7 +252,7 @@
       ],
       "canParallelize": false,
       "planDoc": "02_FRWD_FORMAT_SPEC_V0_1.md"
-    }
+    },
     {
       "id": "t-015",
       "title": "Harden the native safety profile: dataset type, fail-closed CSS, form/link surfaces",
@@ -285,7 +286,7 @@
       ],
       "canParallelize": false,
       "planDoc": "06_AI_NATIVE_EDITING_PROTOCOL.md"
-    }
+    },
     {
       "id": "t-017",
       "title": "Prepared transactions: the reviewed result is the committed result",
@@ -302,7 +303,7 @@
       ],
       "canParallelize": false,
       "planDoc": "06_AI_NATIVE_EDITING_PROTOCOL.md"
-    }
+    },
     {
       "id": "t-018",
       "title": "Conformance rule: substantive content must not be trapped in a closed native details",
@@ -317,7 +318,21 @@
       ],
       "canParallelize": true,
       "planDoc": "05_RICH_MEDIA_AND_INTERACTIVITY.md"
+    },
+    {
+      "id": "t-019",
+      "title": "Remaining designed reference documents (cv, scientific, rich-manual)",
+      "description": "The rest of the designed corpus, each its own shippable slice. cv: dense typographic layout and print fidelity. scientific: MathML equations, numbered figures, tables and cross-references. rich-manual: the one that matters most for the thesis, because the flagship report has no time-based media - embedded video and audio with poster frames, a gallery, and print fallbacks, all self-contained as data URLs, proving rich media feels native rather than bolted on. Same rules as t-008: no document-type-specific format features, only HTML, CSS and existing FRWD primitives, and every document must pass structural and safety conformance plus the cross-browser suite.",
+      "status": "pending",
+      "dependsOn": [],
+      "assignee": "claude",
+      "category": "feature",
+      "affectedPaths": [
+        "fixtures"
+      ],
+      "canParallelize": true,
+      "planDoc": "13_EXAMPLE_DOCUMENTS.md"
     }
   ],
-  "nextId": 19
+  "nextId": 20
 }
