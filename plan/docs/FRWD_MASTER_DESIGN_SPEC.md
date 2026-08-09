@@ -26,29 +26,13 @@ This file concatenates the modular FRWD design documents. When sections conflict
 
 ## 1. Read this first
 
-FRWD is **not** a CV maker, a presentation format, a web-page builder, or merely "HTML with an editor."
-
-It is intended to be a new class of **general-purpose flowing document**:
+FRWD is a new class of **general-purpose flowing document**:
 
 > **Word-like editing and reflow, web-quality design, native rich media, and reliable AI editing — in a durable file.**
 
-A FRWD document should be suitable for:
+It is general-purpose by design. Reports, proposals, papers, theses, manuals, portfolios, technical documentation, business documents, instructional material and rich digital publications are all the same kind of thing to FRWD: flowing semantic content with a visual design attached.
 
-- reports;
-- proposals;
-- papers;
-- theses;
-- manuals;
-- applications;
-- portfolios;
-- CVs;
-- technical documentation;
-- business documents;
-- instructional material;
-- newsletters;
-- rich digital publications.
-
-The CV is a useful demo, not the product definition.
+Those are examples of the range, not a list of supported document types. Any of them may be useful to build as a demonstration, but none of them defines the product, and none should acquire format features of its own.
 
 ## 2. The problem
 
@@ -294,8 +278,6 @@ A useful shorthand is:
 
 > **What would a general-purpose document look like if Word were invented after HTML, CSS, responsive design, video and AI?**
 
-That is closer to FRWD than "PDF for AI."
-
 PDF primarily preserves final appearance.
 
 FRWD aims to preserve:
@@ -477,18 +459,15 @@ That means the quality target is deliberately above:
 
 ## 12. Non-goals
 
+These are architectural boundaries rather than competitive positioning. Each would require a different document model, and adopting any of them would cost FRWD the flowing, portable, inspectable file that is the point of the format.
+
 FRWD 0.1 is not:
 
-- PowerPoint;
-- Figma;
-- Canva;
-- a website builder;
-- a spreadsheet;
-- a notebook execution environment;
-- a CMS;
-- a cloud collaboration suite;
-- a macro platform;
-- a perfect clone of Microsoft Word.
+- a slide or canvas format built from freely positioned objects;
+- a website or application builder;
+- a spreadsheet or calculation engine;
+- a code, notebook or macro execution environment;
+- a cloud-dependent workspace.
 
 ## 13. Long-term product identity
 

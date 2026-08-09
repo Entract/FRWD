@@ -15,29 +15,13 @@ category: feature
 
 ## 1. Read this first
 
-FRWD is **not** a CV maker, a presentation format, a web-page builder, or merely "HTML with an editor."
-
-It is intended to be a new class of **general-purpose flowing document**:
+FRWD is a new class of **general-purpose flowing document**:
 
 > **Word-like editing and reflow, web-quality design, native rich media, and reliable AI editing — in a durable file.**
 
-A FRWD document should be suitable for:
+It is general-purpose by design. Reports, proposals, papers, theses, manuals, portfolios, technical documentation, business documents, instructional material and rich digital publications are all the same kind of thing to FRWD: flowing semantic content with a visual design attached.
 
-- reports;
-- proposals;
-- papers;
-- theses;
-- manuals;
-- applications;
-- portfolios;
-- CVs;
-- technical documentation;
-- business documents;
-- instructional material;
-- newsletters;
-- rich digital publications.
-
-The CV is a useful demo, not the product definition.
+Those are examples of the range, not a list of supported document types. Any of them may be useful to build as a demonstration, but none of them defines the product, and none should acquire format features of its own.
 
 ## 2. The problem
 

@@ -5,42 +5,27 @@
 > Word-like editing and reflow, web-quality design, native rich media, and reliable AI editing — in a durable file you own.
 
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
-[![Status](https://img.shields.io/badge/spec-0.1%20draft-orange.svg)](plan/docs/02_FRWD_FORMAT_SPEC_V0_1.md)
+[![Spec](https://img.shields.io/badge/spec-0.1%20draft-orange.svg)](plan/docs/02_FRWD_FORMAT_SPEC_V0_1.md)
 
----
+FRWD is a general-purpose document format for reports, proposals, papers, manuals, portfolios, technical documentation and anything else that wants to read like a document and look like the web.
 
-## Status
+## Why it exists
 
-**Pre-implementation.** The design pack is complete and the specification is at draft 0.1. Implementation is starting now, in public, so the record of when decisions were made is part of the project.
+Documents are stuck between two formats that each solve half the problem.
 
-Nothing here is stable yet. The format will change before 0.1 is frozen.
+DOCX edits like a document but its visual ceiling is low, and generated output tends to be fragile. HTML has extraordinary typography, layout, responsiveness and media — and generates beautifully from AI — but an HTML file is not something an ordinary person experiences as an editable document.
 
-## What FRWD is
+FRWD closes that gap: the presentation quality of the web, with the editing behaviour of a word processor, in a file that belongs to whoever holds it.
 
-FRWD is a general-purpose document format, not a CV maker, a slide deck, a web-page builder, or "HTML with an editor bolted on".
+## The five properties
 
-Today you choose between two bad options:
+- **F — Flowing.** Insert a paragraph and later content moves. Sections, lists, figures and tables participate in flow; pagination is derived from it rather than replacing it.
+- **R — Rich.** Images, video, audio, equations, charts, galleries, data and callouts are first-class content, not attachments.
+- **W — Web.** HTML and CSS are the rendering foundation, so you inherit real typography, responsive layout, print styles, accessibility primitives and a representation coding models already understand.
+- **D — Document.** A durable artifact you can open, edit, save, email, archive and print. It works offline and needs no account.
+- **AI-native.** Every structural object has a stable identity, so AI edits address semantic objects through explicit operations instead of inferring the document from pixels or rewriting the whole file.
 
-| | DOCX | HTML |
-|---|---|---|
-| Document editing | good | awkward |
-| Web-native design and media | weak | excellent |
-| AI generation and manipulation | awkward | excellent |
-| User owns the file | yes | technically |
-
-FRWD takes the right-hand column and makes it behave like a document.
-
-A `.frwd` file is suitable for reports, proposals, papers, theses, manuals, portfolios, CVs, technical documentation, business documents, instructional material and rich digital publications.
-
-## The five defining properties
-
-- **F — Flowing.** Text behaves like a document, not a slide. Insert a paragraph and later content moves naturally. Pagination is derived from flow, never the underlying content model.
-- **R — Rich.** Images, video, audio, equations, charts, galleries, data, callouts and interactive disclosure are first-class, not attachments.
-- **W — Web.** HTML and CSS are the rendering foundation: real typography, responsive layout, browser portability, print CSS, accessibility primitives — and a representation coding models already understand.
-- **D — Document.** A durable, user-owned artifact. Open it, edit it, save it, email it, archive it, print it. Not a URL. Not a cloud workspace.
-- **AI-native.** Every structural object has stable identity, so AI edits target semantic objects through explicit operations instead of inferring the document from pixels or rewriting the whole file.
-
-## How the format works
+## The core architectural idea
 
 FRWD 0.1 uses **one HTML document as the native source** — not a ZIP container, not an application-specific JSON tree.
 
@@ -48,44 +33,50 @@ FRWD 0.1 uses **one HTML document as the native source** — not a ZIP container
 report.frwd        native document
                    semantic HTML + metadata + CSS/theme + embedded media
                    + stable FRWD identifiers + declarative rich components
-                   contains no arbitrary executable JavaScript
+                   no arbitrary executable JavaScript
 
 report.frwd.html   browser publication
                    the same document plus the trusted standard FRWD runtime
                    (edit mode, safe rich interactivity, Save As, print helpers)
-                   ordinary HTML - opens in any modern browser, offline
+                   ordinary HTML — opens in any modern browser, offline
 ```
 
-Twelve invariants govern the design. Among them: semantic HTML is the canonical document; flow is the default layout model; the native document stays understandable without FRWD software; the native profile contains no arbitrary script; a browser publication remains useful with JavaScript disabled; print and PDF are output views, not the source; and the format depends on no single AI vendor, editor library or cloud service. See [`00_START_HERE.md`](plan/docs/00_START_HERE.md) for the full list — breaking one requires an ADR.
+Because the file is semantic HTML, it stays intelligible to generic tooling, diffs cleanly in version control, and remains readable long after any particular editor has gone.
+
+Twelve invariants govern the design — among them: semantic HTML is the canonical document, flow is the default layout model, the native profile carries no arbitrary script, a publication stays useful with JavaScript disabled, print is an output view rather than the source, and the format depends on no single AI vendor, editor library or cloud service. See [`00_START_HERE.md`](plan/docs/00_START_HERE.md); breaking one requires an ADR.
 
 ## Why open
 
 The format is open. The reference implementation is open. Your documents belong to you, and no company is required to keep them readable.
 
-Everything in this repository — specification and reference implementation — is Apache-2.0. Anyone may implement FRWD, including commercially. The patent grant is deliberate: FRWD aims to be a format, not an app.
+Everything here — specification and reference implementation — is Apache-2.0, patent grant included, because FRWD aims to be a format rather than an app. The name and logo are held back separately so that "FRWD compatible" keeps meaning something: see [`TRADEMARKS.md`](TRADEMARKS.md).
 
-The FRWD name and logo are reserved separately, so that "FRWD compatible" keeps meaning something. You may say your software implements FRWD; you may not imply we certified it. See [`TRADEMARKS.md`](TRADEMARKS.md).
+## Status
 
-## Repository layout
+Early. The specification is at draft 0.1 and the format will change before it is frozen.
 
-```text
-frwd/
-├─ plan/docs/       design pack and draft specification (authoritative)
-│  └─ adr/          architecture decision records
-├─ spec/            normative specification, promoted here when frozen
-├─ docs/            public-facing documentation
-├─ packages/
-│  ├─ format/       parse, serialize, stable object identity
-│  ├─ sanitize/     enforce the native no-script profile
-│  ├─ operations/   deterministic semantic edit operations
-│  ├─ publisher/    emit .frwd.html
-│  └─ runtime/      the trusted browser runtime
-├─ apps/editor/     reference editor
-├─ fixtures/        reference documents - proof, not just test data
-└─ tests/           conformance, roundtrip, security, browser, visual
+| Component | State |
+|---|---|
+| `packages/format` | Parse, serialize, stable identity, validation |
+| `packages/sanitize` | Not started — enforces the native no-script profile |
+| `packages/operations` | Not started — deterministic semantic edit operations |
+| `packages/publisher` + `runtime` | Not started — `.frwd.html` emission |
+| `apps/editor` | Not started — deliberately last |
+
+## Explore
+
+```bash
+corepack enable
+pnpm install
+
+pnpm typecheck
+pnpm test           # unit and conformance suites
+pnpm test:browser   # Chromium, Firefox and WebKit
 ```
 
-The `packages/*` layer is deliberately framework-agnostic. No UI or editing framework is chosen until the editor is built, informed by what the format work teaches us.
+Requires Node 24 LTS.
+
+Start reading at [`plan/docs/00_START_HERE.md`](plan/docs/00_START_HERE.md), which defines the invariants and the precedence order when documents disagree. The draft format specification is [`plan/docs/02_FRWD_FORMAT_SPEC_V0_1.md`](plan/docs/02_FRWD_FORMAT_SPEC_V0_1.md), and [`docs/`](docs/) maps the rest.
 
 ## The first proof
 
@@ -106,28 +97,9 @@ AI creates a beautiful FRWD report
 
 If that works, the core idea works.
 
-## Development
-
-Requires **Node 24 LTS** and **pnpm** (provided via Corepack).
-
-```bash
-corepack enable
-pnpm install
-
-pnpm typecheck      # TypeScript, whole workspace
-pnpm test           # Vitest unit and conformance tests
-pnpm test:browser   # Playwright against Chromium, Firefox and WebKit
-```
-
-## Documentation
-
-Start with [`plan/docs/00_START_HERE.md`](plan/docs/00_START_HERE.md). It defines the invariants and the precedence order to use when documents conflict.
-
-The draft format specification is [`plan/docs/02_FRWD_FORMAT_SPEC_V0_1.md`](plan/docs/02_FRWD_FORMAT_SPEC_V0_1.md).
-
 ## Contributing
 
-Not yet — there is nothing meaningful to contribute to until the format package and conformance fixtures land. A `CONTRIBUTING.md` will arrive at that point. Issues and design discussion are welcome now.
+There is not yet enough implementation to contribute to meaningfully; a `CONTRIBUTING.md` will arrive once the format package and conformance fixtures are settled. Issues and design discussion are welcome now.
 
 ## License
 

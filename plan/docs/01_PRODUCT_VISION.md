@@ -14,8 +14,6 @@ A useful shorthand is:
 
 > **What would a general-purpose document look like if Word were invented after HTML, CSS, responsive design, video and AI?**
 
-That is closer to FRWD than "PDF for AI."
-
 PDF primarily preserves final appearance.
 
 FRWD aims to preserve:
@@ -197,18 +195,15 @@ That means the quality target is deliberately above:
 
 ## 12. Non-goals
 
+These are architectural boundaries rather than competitive positioning. Each would require a different document model, and adopting any of them would cost FRWD the flowing, portable, inspectable file that is the point of the format.
+
 FRWD 0.1 is not:
 
-- PowerPoint;
-- Figma;
-- Canva;
-- a website builder;
-- a spreadsheet;
-- a notebook execution environment;
-- a CMS;
-- a cloud collaboration suite;
-- a macro platform;
-- a perfect clone of Microsoft Word.
+- a slide or canvas format built from freely positioned objects;
+- a website or application builder;
+- a spreadsheet or calculation engine;
+- a code, notebook or macro execution environment;
+- a cloud-dependent workspace.
 
 ## 13. Long-term product identity
 
