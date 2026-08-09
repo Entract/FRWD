@@ -1,8 +1,8 @@
 import { parse, parseFragment as parse5Fragment } from "parse5";
 import { readAssets } from "./assets.js";
-import { DOCUMENT_ATTR, DOCUMENT_ID_META, FRWD_VERSION, ID_ATTR, VERSION_ATTR, requiresStableId } from "./constants.js";
+import { DOCUMENT_ATTR, DOCUMENT_ID_META, FRWD_VERSION, ID_ATTR, VERSION_ATTR } from "./constants.js";
 import { findByTagName, findElement, getAttr, hasAttr, walkElements } from "./dom.js";
-import { collectIdentified, diagnoseIdentity, ensureIds, findById } from "./identity.js";
+import { collectIdentified, diagnoseIdentity, ensureIds, findById, requiresStableIdForElement } from "./identity.js";
 import { readManifest, stringifyManifest, writeManifest } from "./manifest.js";
 import { canonicalizeAttributes, serializeDocument } from "./serialize.js";
 import { readDocumentStyle, writeDocumentStyle } from "./style.js";
@@ -201,7 +201,7 @@ function diagnoseCollapsedContent(root: Element): Diagnostic[] {
     if (element.tagName !== "details" || hasAttr(element, "open")) continue;
 
     const blocks = [...walkElements(element)].filter(
-      (descendant) => descendant !== element && requiresStableId(descendant.tagName),
+      (descendant) => descendant !== element && requiresStableIdForElement(descendant),
     );
     if (blocks.length === 0) continue;
 

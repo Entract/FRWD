@@ -338,9 +338,9 @@
     },
     {
       "id": "t-020",
-      "title": "Diagnose Firefox audio decode in the rich manual",
+      "title": "Firefox audio: diagnosed as a test defect, not a portability problem",
       "description": "Firefox plays the embedded video in fixtures/rich-manual/field-calibration.frwd but leaves the audio at readyState 0. A standalone probe shows Firefox decoding the same Ogg and MP3 from data: URLs without complaint, and decoding them from file:// URLs fails in the same probe - so the encoding is fine and data: URLs are fine, and something about the element configuration or the document context is not. Worth understanding rather than working around, because self-contained audio is part of the portability claim: if there is a real constraint on how audio must be declared for it to work everywhere, the format should say so. The browser suite currently skips this one assertion in Firefox with a pointer here.",
-      "status": "in-progress",
+      "status": "done",
       "dependsOn": [],
       "assignee": "claude",
       "category": "feature",
@@ -349,13 +349,14 @@
         "tests/browser"
       ],
       "canParallelize": true,
-      "planDoc": "05_RICH_MEDIA_AND_INTERACTIVITY.md"
+      "planDoc": "05_RICH_MEDIA_AND_INTERACTIVITY.md",
+      "completedCommit": "289106891411709007aa4dfc32882644f17c5a34"
     },
     {
       "id": "t-021",
       "title": "Scientific reference document",
       "description": "The next designed document after the rich manual: MathML equations as the canonical representation, numbered figures and tables, cross-references, and a references section. Same rules - no document-type-specific format features, only HTML, CSS and existing FRWD primitives, structural and safety conformance, and cross-browser coverage. MathML is the one area likely to expose a genuine gap: if the existing model cannot express something essential, stop and record why before adding a primitive.",
-      "status": "pending",
+      "status": "in-progress",
       "dependsOn": [],
       "assignee": "claude",
       "category": "feature",

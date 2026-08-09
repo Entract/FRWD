@@ -11,6 +11,20 @@ import type { Diagnostic, Element, EnsureIdsResult, Node } from "./types.js";
  * uniqueness and stability is the single guarantee this module exists to keep.
  */
 
+/**
+ * Does this specific element need a stable id?
+ *
+ * Tag name alone is not always enough. MathML <math> is inline by default and
+ * only becomes a block object with display="block" - so requiring an id on
+ * every <math> would treat an equation written mid-sentence as an editable
+ * block, which is the same mistake as wrapping every emphasised word in an
+ * addressable object.
+ */
+export function requiresStableIdForElement(element: Element): boolean {
+  if (element.tagName === "math") return getAttr(element, "display") === "block";
+  return requiresStableId(element.tagName);
+}
+
 function defaultIdFactory(): string {
   return globalThis.crypto.randomUUID();
 }
@@ -41,7 +55,7 @@ export function findById(root: Node, id: string): Element | undefined {
 export function findUnidentified(root: Node): Element[] {
   const missing: Element[] = [];
   for (const element of walkElements(root)) {
-    if (requiresStableId(element.tagName) && getAttr(element, ID_ATTR) === undefined) {
+    if (requiresStableIdForElement(element) && getAttr(element, ID_ATTR) === undefined) {
       missing.push(element);
     }
   }

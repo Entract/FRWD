@@ -48,6 +48,7 @@ export {
   findById,
   findDuplicateIds,
   findUnidentified,
+  requiresStableIdForElement,
 } from "./identity.js";
 
 export { findManifestElement, readManifest, stringifyManifest, validateManifest, writeManifest } from "./manifest.js";

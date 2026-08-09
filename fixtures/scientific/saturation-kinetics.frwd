@@ -1,0 +1,163 @@
+<!DOCTYPE html><html data-frwd-version="0.1" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1" name="viewport">
+<meta content="FRWD" name="generator">
+<meta content="5e2c8a7f-4d31-4b96-8c05-7a1e93f2d648" name="frwd-document-id">
+<title>Saturation kinetics of thin-film humidity sensors</title>
+<script id="frwd-manifest" type="application/frwd+json">
+{
+  "format": "frwd",
+  "version": "0.1",
+  "documentId": "5e2c8a7f-4d31-4b96-8c05-7a1e93f2d648",
+  "title": "Saturation kinetics of thin-film humidity sensors",
+  "created": "2026-08-09T09:00:00Z",
+  "modified": "2026-08-09T09:00:00Z",
+  "language": "en",
+  "description": "A short paper: MathML equations as the canonical representation, CSS-counter numbering for sections, figures, equations and tables, and ordinary fragment links for cross-references.",
+  "authors": ["R. Okonkwo", "M. Halvorsen"],
+  "subject": "Sensor physics"
+}
+</script>
+<style id="frwd-document-style">
+:root {
+  color-scheme: light dark;
+  --ink: #14171c; --quiet: #5a6371; --paper: #fdfdfc; --rule: #e3e0da;
+  --accent: #2a4a7f; --accent-soft: #eaeef6;
+  --measure: 34rem; --gutter: clamp(1.25rem, 5vw, 3rem);
+  --serif: "Iowan Old Style", Palatino, Georgia, ui-serif, serif;
+  --sans: ui-sans-serif, "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --ink: #e7e9ed; --quiet: #99a2b1; --paper: #0e1116; --rule: #252b34; --accent: #8fb4f0; --accent-soft: #161d29; }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 400 1.0625rem/1.7 var(--serif); }
+main { display: block; }
+
+.paper { max-width: var(--measure); margin-inline: auto; padding: clamp(2.5rem, 8vh, 5rem) var(--gutter); counter-reset: section figure equation table; }
+
+.title { font: 600 clamp(1.7rem, 4.5vw, 2.4rem)/1.15 var(--sans); letter-spacing: -0.025em; margin: 0 0 0.75rem; text-wrap: balance; }
+.authors { font: 400 0.9375rem/1.5 var(--sans); color: var(--quiet); margin: 0 0 0.35rem; }
+.affiliation { font: 400 0.8125rem/1.5 var(--sans); color: var(--quiet); margin: 0 0 1.75rem; }
+
+.abstract { background: var(--accent-soft); border-left: 3px solid var(--accent); padding: 1rem 1.15rem; margin: 0 0 2.5rem; border-radius: 0 4px 4px 0; }
+.abstract h2 { font: 600 0.75rem/1.3 var(--sans); letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin: 0 0 0.5rem; counter-increment: none; }
+.abstract h2::before { content: none; }
+.abstract p { margin: 0; font-size: 0.9375rem; line-height: 1.6; }
+
+h2 { font: 600 1.25rem/1.25 var(--sans); letter-spacing: -0.015em; margin: 2.5rem 0 0.6rem; counter-increment: section; }
+h2::before { content: counter(section) ". "; color: var(--quiet); font-variant-numeric: tabular-nums; }
+h3 { font: 600 0.9375rem/1.3 var(--sans); margin: 1.5rem 0 0.4rem; }
+p { margin: 0 0 1.05rem; text-wrap: pretty; }
+a { color: var(--accent); }
+
+/* Equations: numbered by CSS counter, referenced by ordinary fragment links. */
+.equation { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 1rem; margin: 1.5rem 0; counter-increment: equation; }
+.equation > math { justify-self: center; overflow-x: auto; max-width: 100%; }
+.equation::after { content: "(" counter(equation) ")"; color: var(--quiet); font: 400 0.875rem/1 var(--sans); font-variant-numeric: tabular-nums; }
+math { font-size: 1.05em; }
+
+figure { margin: 1.75rem 0; counter-increment: figure; }
+figure svg { display: block; width: 100%; height: auto; }
+figcaption { font: 400 0.8125rem/1.55 var(--sans); color: var(--quiet); margin-top: 0.55rem; padding-top: 0.55rem; border-top: 1px solid var(--rule); }
+figcaption::before { content: "Figure " counter(figure) ". "; font-weight: 600; color: var(--ink); }
+
+.table-scroll { overflow-x: auto; margin: 1.75rem 0; }
+table { width: 100%; border-collapse: collapse; font: 400 0.9375rem/1.5 var(--sans); font-variant-numeric: tabular-nums; counter-increment: table; }
+caption { text-align: left; font: 400 0.8125rem/1.5 var(--sans); color: var(--quiet); padding-bottom: 0.6rem; }
+caption::before { content: "Table " counter(table) ". "; font-weight: 600; color: var(--ink); }
+th, td { padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--rule); text-align: right; }
+th:first-child, td:first-child { text-align: left; padding-left: 0; }
+thead th { border-bottom: 2px solid var(--ink); color: var(--quiet); font-weight: 600; }
+
+.references { font: 400 0.875rem/1.6 var(--sans); color: var(--quiet); padding-left: 1.25rem; }
+.references li { margin-bottom: 0.55rem; }
+.references cite { font-style: normal; color: var(--ink); }
+
+@media print {
+  :root { --ink: #000; --quiet: #444; --paper: #fff; --rule: #bbb; --accent: #1d3a68; }
+  body { font-size: 10pt; line-height: 1.4; }
+  .paper { max-width: none; padding: 0; }
+  .abstract { background: none; border-left: 2px solid #000; }
+  figure, table, .equation { break-inside: avoid; }
+  h2, h3 { break-after: avoid-page; }
+  p { orphans: 3; widows: 3; }
+}
+</style>
+</head>
+<body>
+<main data-frwd-document="">
+<article data-frwd-id="5e2c8a7f-4d31-4b96-8c05-000000000001" class="paper">
+
+<header data-frwd-id="5e2c8a7f-4d31-4b96-8c05-000000000002">
+<h1 data-frwd-id="5e2c8a7f-4d31-4b96-8c05-000000000003" class="title">Saturation kinetics of thin-film humidity sensors</h1>
+<p data-frwd-id="5e2c8a7f-4d31-4b96-8c05-000000000004" class="authors">R. Okonkwo, M. Halvorsen</p>
+<p data-frwd-id="5e2c8a7f-4d31-4b96-8c05-000000000005" class="affiliation">Northwind Instruments, Materials Group</p>
+</header>
+
+<section data-frwd-id="5e2c8a7f-4d31-4b96-8c05-000000000006" class="abstract">
+<h2 data-frwd-id="5e2c8a7f-4d31-4b96-8c05-000000000007">Abstract</h2>
+<p data-frwd-id="5e2c8a7f-4d31-4b96-8c05-000000000008">Thin-film humidity sensors are usually modelled as first-order systems, which fits their early response and fails badly near saturation. We fit a two-term model to eleven devices and find that the second-order desorption term accounts for the residual error that first-order fits attribute to drift.</p>
+</section>
+
+<section data-frwd-id="5e2c8a7f-4d31-4b96-8c05-000000000009">
+<h2 data-frwd-id="5e2c8a7f-4d31-4b96-8c05-000000000010">Model</h2>
+<p data-frwd-id="5e2c8a7f-4d31-4b96-8c05-000000000011">Let <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>θ</mi></math> be fractional saturation and <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>τ</mi></math> dimensionless time. The first-order model treats adsorption as proportional to the unoccupied fraction alone. Adding a desorption term quadratic in <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>θ</mi></math> gives <a data-frwd-id="5e2c8a7f-4d31-4b96-8c05-000000000012" href="#eq-kinetics">equation (1)</a>:</p>
+
+<div data-frwd-id="5e2c8a7f-4d31-4b96-8c05-000000000013" class="equation" id="eq-kinetics">
+<math data-frwd-id="5e2c8a7f-4d31-4b96-8c05-000000000014" display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow>
+<mfrac><mrow><mi>d</mi><mi>θ</mi></mrow><mrow><mi>d</mi><mi>τ</mi></mrow></mfrac>
+<mo>=</mo>
+<mi>k</mi><mo>⁡</mo><mrow><mo>(</mo><mn>1</mn><mo>−</mo><mi>θ</mi><mo>)</mo></mrow>
+<mo>−</mo>
+<msub><mi>k</mi><mn>2</mn></msub><msup><mi>θ</mi><mn>2</mn></msup>
+</mrow>
+</math>
+</div>
+
+<p data-frwd-id="5e2c8a7f-4d31-4b96-8c05-000000000015">The equation is MathML, not an image of an equation. It reflows, it scales with the text, a screen reader can speak it, and a tool that has never heard of FRWD can still extract it as structure rather than pixels.</p>
+</section>
+
+<section data-frwd-id="5e2c8a7f-4d31-4b96-8c05-000000000016">
+<h2 data-frwd-id="5e2c8a7f-4d31-4b96-8c05-000000000017">Results</h2>
+<p data-frwd-id="5e2c8a7f-4d31-4b96-8c05-000000000018">Saturation rises steeply through the first five time constants and then flattens, as shown in <a data-frwd-id="5e2c8a7f-4d31-4b96-8c05-000000000019" href="#fig-saturation">Figure 1</a>. Fitted constants for the three film thicknesses appear in <a data-frwd-id="5e2c8a7f-4d31-4b96-8c05-000000000020" href="#tab-constants">Table 1</a>.</p>
+
+<figure data-frwd-id="5e2c8a7f-4d31-4b96-8c05-000000000021" id="fig-saturation">
+<svg aria-labelledby="plot-title" preserveAspectRatio="xMidYMid meet" role="img" style="color: var(--accent)" viewBox="0 0 640 290"><title id="plot-title">Saturation rises steeply to about 0.66 by τ = 5 and flattens towards 0.95 by τ = 10.</title><line stroke="currentColor" stroke-opacity="0.13" x1="46" x2="624" y1="214.0" y2="214.0"></line><text fill="currentColor" fill-opacity="0.55" font-size="11" text-anchor="end" x="38" y="218.0">0.00</text><line stroke="currentColor" stroke-opacity="0.13" x1="46" x2="624" y1="165.0" y2="165.0"></line><text fill="currentColor" fill-opacity="0.55" font-size="11" text-anchor="end" x="38" y="169.0">0.25</text><line stroke="currentColor" stroke-opacity="0.13" x1="46" x2="624" y1="116.0" y2="116.0"></line><text fill="currentColor" fill-opacity="0.55" font-size="11" text-anchor="end" x="38" y="120.0">0.50</text><line stroke="currentColor" stroke-opacity="0.13" x1="46" x2="624" y1="67.0" y2="67.0"></line><text fill="currentColor" fill-opacity="0.55" font-size="11" text-anchor="end" x="38" y="71.0">0.75</text><line stroke="currentColor" stroke-opacity="0.13" x1="46" x2="624" y1="18.0" y2="18.0"></line><text fill="currentColor" fill-opacity="0.55" font-size="11" text-anchor="end" x="38" y="22.0">1.00</text><text fill="currentColor" fill-opacity="0.55" font-size="11" text-anchor="middle" x="46.0" y="232">0</text><text fill="currentColor" fill-opacity="0.55" font-size="11" text-anchor="middle" x="161.6" y="232">2</text><text fill="currentColor" fill-opacity="0.55" font-size="11" text-anchor="middle" x="277.2" y="232">4</text><text fill="currentColor" fill-opacity="0.55" font-size="11" text-anchor="middle" x="392.8" y="232">6</text><text fill="currentColor" fill-opacity="0.55" font-size="11" text-anchor="middle" x="508.4" y="232">8</text><text fill="currentColor" fill-opacity="0.55" font-size="11" text-anchor="middle" x="624.0" y="232">10</text><path d="M46.0 210.1 L103.8 196.4 L161.6 172.8 L219.4 143.4 L277.2 112.1 L335.0 84.6 L392.8 63.1 L450.6 47.4 L508.4 37.6 L566.2 31.7 L624.0 27.8" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"></path><circle cx="46.0" cy="210.1" fill="currentColor" r="3"></circle><circle cx="103.8" cy="196.4" fill="currentColor" r="3"></circle><circle cx="161.6" cy="172.8" fill="currentColor" r="3"></circle><circle cx="219.4" cy="143.4" fill="currentColor" r="3"></circle><circle cx="277.2" cy="112.1" fill="currentColor" r="3"></circle><circle cx="335.0" cy="84.6" fill="currentColor" r="3"></circle><circle cx="392.8" cy="63.1" fill="currentColor" r="3"></circle><circle cx="450.6" cy="47.4" fill="currentColor" r="3"></circle><circle cx="508.4" cy="37.6" fill="currentColor" r="3"></circle><circle cx="566.2" cy="31.7" fill="currentColor" r="3"></circle><circle cx="624.0" cy="27.8" fill="currentColor" r="3"></circle><line stroke="currentColor" stroke-opacity="0.45" x1="46" x2="624" y1="214" y2="214"></line><text fill="currentColor" fill-opacity="0.65" font-size="11" text-anchor="middle" x="335" y="252">dimensionless time τ</text></svg>
+<figcaption data-frwd-id="5e2c8a7f-4d31-4b96-8c05-000000000022">Mean fractional saturation against dimensionless time for eleven devices at 220 nm film thickness. The curve is the two-term fit; markers are measured means. Error bars are omitted at this scale because they are smaller than the markers.</figcaption>
+</figure>
+
+<div data-frwd-id="5e2c8a7f-4d31-4b96-8c05-000000000023" class="table-scroll">
+<table data-frwd-id="5e2c8a7f-4d31-4b96-8c05-000000000024" id="tab-constants">
+<caption data-frwd-id="5e2c8a7f-4d31-4b96-8c05-000000000025">Fitted rate constants by film thickness, with residual error under each model.</caption>
+<thead>
+<tr><th scope="col">Thickness (nm)</th><th scope="col">k</th><th scope="col">k₂</th><th scope="col">RMSE, first-order</th><th scope="col">RMSE, two-term</th></tr>
+</thead>
+<tbody>
+<tr><th scope="row">140</th><td>0.42</td><td>0.11</td><td>0.038</td><td>0.009</td></tr>
+<tr><th scope="row">220</th><td>0.31</td><td>0.14</td><td>0.041</td><td>0.007</td></tr>
+<tr><th scope="row">310</th><td>0.24</td><td>0.19</td><td>0.052</td><td>0.011</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+
+<section data-frwd-id="5e2c8a7f-4d31-4b96-8c05-000000000026">
+<h2 data-frwd-id="5e2c8a7f-4d31-4b96-8c05-000000000027">Discussion</h2>
+<p data-frwd-id="5e2c8a7f-4d31-4b96-8c05-000000000028">The residual that first-order fits attribute to sensor drift is, on this evidence, the desorption term. That distinction matters in service: drift is corrected by recalibration, whereas a systematic model error is not, and a device recalibrated against the wrong model will read confidently and incorrectly near saturation.</p>
+<p data-frwd-id="5e2c8a7f-4d31-4b96-8c05-000000000029">The effect grows with film thickness, which is consistent with desorption being limited by diffusion out of the film rather than by surface kinetics.</p>
+</section>
+
+<section data-frwd-id="5e2c8a7f-4d31-4b96-8c05-000000000030">
+<h2 data-frwd-id="5e2c8a7f-4d31-4b96-8c05-000000000031">References</h2>
+<ol data-frwd-id="5e2c8a7f-4d31-4b96-8c05-000000000032" class="references">
+<li data-frwd-id="5e2c8a7f-4d31-4b96-8c05-000000000033"><cite>Adsorption dynamics in polymer humidity sensors</cite>. Journal of Sensor Physics, 2024.</li>
+<li data-frwd-id="5e2c8a7f-4d31-4b96-8c05-000000000034"><cite>Calibration practice for field-deployed hygrometry</cite>. Northwind Technical Note 11, 2025.</li>
+</ol>
+</section>
+
+</article>
+</main>
+
+</body></html>

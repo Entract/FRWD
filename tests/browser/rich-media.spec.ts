@@ -107,6 +107,9 @@ test.describe("the media participates in flow", () => {
     for (const width of [360, 768, 1024, 1440]) {
       await page.setViewportSize({ width, height: 900 });
       await page.goto(MANUAL);
+      // Wait for the element rather than assuming navigation implies parsed:
+      // at this size one engine resolves goto before the media element exists.
+      await page.locator("video").waitFor();
 
       const measurements = await page.evaluate(() => {
         const video = document.querySelector("video")!.getBoundingClientRect();

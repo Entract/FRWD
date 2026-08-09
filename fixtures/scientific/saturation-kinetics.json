@@ -1,0 +1,9 @@
+{
+  "title": "Saturation kinetics of thin-film humidity sensors",
+  "description": "A short paper. MathML is the canonical equation representation, inline and display; sections, figures, equations and tables are numbered by CSS counters so the numbering follows the flow rather than being typed in; cross-references are ordinary fragment links.",
+  "conforming": true,
+  "canonical": true,
+  "expectedDiagnostics": [],
+  "profileConforming": true,
+  "expectedProfileDiagnostics": []
+}
