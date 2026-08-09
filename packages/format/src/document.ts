@@ -1,4 +1,4 @@
-import { parse } from "parse5";
+import { parse, parseFragment as parse5Fragment } from "parse5";
 import { readAssets } from "./assets.js";
 import { DOCUMENT_ATTR, DOCUMENT_ID_META, FRWD_VERSION, ID_ATTR, VERSION_ATTR } from "./constants.js";
 import { findByTagName, findElement, getAttr, walkElements } from "./dom.js";
@@ -9,6 +9,7 @@ import { readDocumentStyle, writeDocumentStyle } from "./style.js";
 import type {
   Diagnostic,
   Document,
+  DocumentFragment,
   Element,
   EnsureIdsResult,
   FrwdAsset,
@@ -162,6 +163,19 @@ export class FrwdDocument {
   toHtml(): string {
     return serializeDocument(this.tree);
   }
+}
+
+/**
+ * Parse an HTML fragment, such as the markup an edit operation supplies.
+ *
+ * The context element matters: `<li>` outside a list, or `<td>` outside a row,
+ * is discarded by the HTML5 fragment parsing algorithm. Pass the element the
+ * fragment will live inside and the parse matches what the document will hold.
+ */
+export function parseFragment(html: string, context?: Element): DocumentFragment {
+  const fragment = context ? parse5Fragment(context, html, {}) : parse5Fragment(html);
+  canonicalizeAttributes(fragment);
+  return fragment;
 }
 
 function findDocumentRoot(tree: Document): Element | undefined {

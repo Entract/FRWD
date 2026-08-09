@@ -6,7 +6,7 @@
  * document model that could drift from the file.
  */
 
-export { FrwdDocument } from "./document.js";
+export { FrwdDocument, parseFragment } from "./document.js";
 
 export {
   ASSET_ID_ATTR,
@@ -63,6 +63,7 @@ export type {
   ChildNode,
   Diagnostic,
   Document,
+  DocumentFragment,
   Element,
   EnsureIdsResult,
   FrwdAsset,

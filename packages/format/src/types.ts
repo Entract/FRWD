@@ -7,6 +7,7 @@ export type ChildNode = DefaultTreeAdapterTypes.ChildNode;
 export type Element = DefaultTreeAdapterTypes.Element;
 export type TextNode = DefaultTreeAdapterTypes.TextNode;
 export type Document = DefaultTreeAdapterTypes.Document;
+export type DocumentFragment = DefaultTreeAdapterTypes.DocumentFragment;
 export type Attribute = Element["attrs"][number];
 
 /**

@@ -1,0 +1,24 @@
+{
+  "name": "@frwd/operations",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Deterministic semantic edit operations over stable FRWD identifiers. Atomic transactions on a staged document.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc --build"
+  },
+  "dependencies": {
+    "@frwd/format": "workspace:*",
+    "@frwd/sanitize": "workspace:*"
+  }
+}

@@ -81,8 +81,8 @@
     {
       "id": "t-005",
       "title": "packages/operations - deterministic semantic edit operations",
-      "description": "The AI-native editing protocol as deterministic, testable operations over stable document objects: insert/replace/delete/move block, set attributes, restyle without changing content, and the addressing scheme that targets data-frwd-id. Pure functions over the format model, fully covered by unit tests. No AI chat UI, no network, no model vendor dependency.",
-      "status": "pending",
+      "description": "The AI-native editing protocol as deterministic, testable operations over stable document objects: replace_text, replace_node, insert_before, insert_after, append_child, prepend_child, delete_node, move_node and set_attribute, addressed by data-frwd-id. No AI chat UI, no network, no model vendor dependency. Style and theme operations are deliberately deferred to t-016 so the structural core lands first. LOCKED TRANSACTION SEMANTICS: preview is strictly non-mutating; operations apply to a staged copy, never optimistically to the live tree with rollback; a failed transaction changes absolutely nothing; a successful one increments revision exactly once and updates modified exactly once; an absent manifest revision reads as 0; the staged final state must pass both structural and native safety-profile conformance before commit; unsafe generated content is rejected and reported, never silently sanitized; inserted and replacement structural nodes must end with valid unique stable ids, and no ambiguous target may be committed. replace_text is deliberately simple in v0.1: it replaces the target's complete child content with one escaped plain-text node and makes no attempt to preserve strong, links, citations or other inline markup; rich replacement uses replace_node, and range-aware editing is deferred.",
+      "status": "in-progress",
       "dependsOn": [
         "t-004"
       ],
@@ -254,7 +254,8 @@
       "id": "t-015",
       "title": "Harden the native safety profile: dataset type, fail-closed CSS, form/link surfaces",
       "description": "Three corrections to the profile. First, accept application/frwd-dataset+json as inert FRWD data - the rich-media spec section 7 defines datasets with that type, so the sanitizer currently rejects a construct FRWD 0.1 requires. Second, make css-parse-error an error rather than a warning: if the security layer cannot parse the CSS it cannot establish that the CSS makes no external requests, and the native profile must fail closed. Third, close user-triggered and network surfaces that native 0.1 gains nothing from: forbid <form> (forms are deferred and need an explicit future design and security model), forbid <link> (FRWD already owns its stylesheet in style#frwd-document-style, so an element that can pull in an uninspected stylesheet is pure attack surface), and reject the formaction and ping attributes. Add a focused regression fixture for each, plus a positive fixture proving an inert dataset block is accepted.",
-      "status": "in-progress",
+      "status": "done",
+      "completedCommit": "26bdb7db79b52773115a0035b47d368414151978",
       "dependsOn": [],
       "assignee": "claude",
       "category": "feature",

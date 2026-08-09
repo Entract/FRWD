@@ -11,6 +11,9 @@ importers:
       '@frwd/format':
         specifier: workspace:*
         version: link:packages/format
+      '@frwd/operations':
+        specifier: workspace:*
+        version: link:packages/operations
       '@frwd/sanitize':
         specifier: workspace:*
         version: link:packages/sanitize
@@ -35,6 +38,15 @@ importers:
       parse5:
         specifier: ^8.0.1
         version: 8.0.1
+
+  packages/operations:
+    dependencies:
+      '@frwd/format':
+        specifier: workspace:*
+        version: link:../format
+      '@frwd/sanitize':
+        specifier: workspace:*
+        version: link:../sanitize
 
   packages/sanitize:
     dependencies:
