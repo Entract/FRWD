@@ -50,6 +50,24 @@ Undo currently stores whole-document snapshots. That is honest rather than cleve
 
 Pasted HTML is imported content and crosses the same trust boundary as a file: it goes through the safety profile before it reaches the document. Unlike opening a file, repairing here is right — the user is asking to bring the content in, not to have it preserved as received.
 
+## Selection, containers and direct manipulation
+
+Clicking selects the **innermost** identified object, because that is what someone pointing at a word means. The breadcrumb is how you get out of it:
+
+```text
+main › div.body › aside.rail › dl.metric
+```
+
+Every step above the current one is clickable, so reaching the card a paragraph lives in takes one click. Selection outlines, the breadcrumb and the drag handle are chrome: they live on the projection and in the stage, never in the document, and a saved file contains none of them.
+
+**Insertion reasons from context.** A paragraph gets a sibling in whatever container it already lives in, so content inside a card stays inside the card. A list item gets another list item, not a naked paragraph beside the list. A container gets content inside it. A figure caption, a table cell or a description-list term gets a refusal with a reason, because guessing there is worse than declining.
+
+That logic reads HTML semantics and the real hierarchy — no fixture class name appears in it. New objects get their identity from the operations layer's own minting path, never from the shape or sequence of existing ids.
+
+It is an **editor tool**, not a FRWD operation: it decides intent and compiles to `insert_after` or `append_child`. Two conforming editors could reasonably disagree about what "insert" means, which is protocol §4a's test for what belongs at this layer.
+
+**Dragging reorders siblings within one parent**, committed through `move_node`. Deliberately narrow: a drag cannot produce an arrangement the document could not already express, and there are no coordinates anywhere. Dragging outside the parent is refused and snaps back rather than guessed at. The thing being dragged is a projection; the thing being moved is the document.
+
 ## Read-only is a session property
 
 A file that does not open as a conforming native FRWD is displayed, diagnosed and quarantined. Not partly: no region mounts, no text is editable, no formatting applies, no operation runs, and it cannot be saved over as though it were native. Opening a `.frwd.html` publication lands here, because a publication carries the runtime and a native FRWD carries no script.

@@ -36,7 +36,7 @@
       "id": "t-025",
       "title": "Editor shell hardening and end-to-end browser tests",
       "description": "Two bugs manual use found, plus the E2E coverage that would have found them. First: a non-conforming or non-native document is displayed and diagnosed but must not be mutable at all - no region mounting, no text editing, no formatting, no insert/move/theme operations, no saving over as though it were native FRWD. Opening a .frwd.html publication currently refuses operations but still lets text regions mount, which contradicts the load pipeline written down in t-023. Enforced at the session boundary rather than only in the shell, so the rule holds wherever it is called from, and the native file picker stops offering generic .html. Second: toolbar bold, italic and link do nothing because the global outside-surface mousedown handler commits the region before the click handler runs; the toolbar must preserve the active region, its selection and enough focus to apply a mark, without letting chrome leak into canonical state. Then a Playwright project that launches the editor server and drives the real UI: the native happy path through formatting, insert, move, theme token, undo, redo and save with the saved output re-parsed and re-validated; the unsafe path proving read-only really is read-only and the source is untouched; and a regression that uses the actual toolbar buttons rather than region-model methods. Scope stays narrow - no drag and drop, no property panels, no importer, no AI panel.",
-      "status": "in-progress",
+      "status": "done",
       "dependsOn": [],
       "assignee": "claude",
       "category": "feature",
@@ -46,8 +46,24 @@
         "playwright.editor.config.ts"
       ],
       "canParallelize": false,
+      "planDoc": "07_EDITOR_ARCHITECTURE.md",
+      "completedCommit": "a851bc76e68df85f411e938d9ffb822dbf8fe8a3"
+    },
+    {
+      "id": "t-026",
+      "title": "Contextual block editing and direct manipulation",
+      "description": "Make the document feel structurally editable rather than adding more toolbar commands, and establish the selection and container model the later style/layout inspector will depend on. A real editor selection model distinguishing the selected FRWD object, the active text region, the object parent and its position among siblings - all editor state, never written into the canonical tree. Contextual insertion that reasons from the actual semantic parent: a sibling paragraph in ordinary flow, another li inside a list, content staying inside the card or section it belongs to, and a refusal with an explanation where the context is genuinely ambiguous, with no fixture class names hard-coded and new ids minted through one shared path rather than inferred from the shape of existing ones. This is an editor tool compiling to existing structural operations, not a new normative FRWD operation. Direct reordering by dragging a handle, deliberately narrow: identified sibling blocks within one parent, committed through move_node, with cross-container drags refused rather than guessed - drag changes semantic order in flow, it does not turn a flowing document into a canvas. A minimal breadcrumb so nested selection is understandable. Shell end-to-end coverage through the real UI for contextual insertion in flow and list contexts, drag reorder with the id travelling and undo/redo, nested selection, and a save that re-parses conforming and inside the safety profile. Not in scope: cross-parent dragging, pixel positioning, spacing or property panels, CSS editing, page/flow modes, AI panel, multi-block text selection.",
+      "status": "in-progress",
+      "dependsOn": [],
+      "assignee": "claude",
+      "category": "feature",
+      "affectedPaths": [
+        "apps/editor/src",
+        "tests/editor"
+      ],
+      "canParallelize": false,
       "planDoc": "07_EDITOR_ARCHITECTURE.md"
     }
   ],
-  "nextId": 26
+  "nextId": 27
 }

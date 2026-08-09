@@ -1,4 +1,13 @@
-import { getAttr, ID_ATTR, parseFragment, serializeElement, walkElements, type Element as FrwdElement } from "@frwd/format";
+import {
+  getAttr,
+  ID_ATTR,
+  isElement,
+  parseFragment,
+  serializeElement,
+  walkElements,
+  type Element as FrwdElement,
+} from "@frwd/format";
+import { identifiedSiblings, planInsertion } from "./core/insertion.js";
 import { EditorSession } from "./core/session.js";
 import { mountRegion, type Region } from "./core/mount.js";
 
@@ -22,6 +31,10 @@ interface Shell {
   root: HTMLElement;
   surface: HTMLElement;
   quarantine: HTMLElement;
+  breadcrumb: HTMLElement;
+  handle: HTMLButtonElement;
+  drop: HTMLElement;
+  stage: HTMLElement;
   style: HTMLStyleElement;
   status: HTMLElement;
 }
@@ -58,7 +71,12 @@ function build(): Shell {
       <button id="publish">Publish .frwd.html</button>
     </header>
     <div id="quarantine" class="chrome-quarantine" hidden></div>
-    <main class="chrome-stage"><div id="surface" class="chrome-surface"></div></main>
+    <nav class="chrome-breadcrumb" id="breadcrumb" aria-label="Selected object"></nav>
+    <main class="chrome-stage">
+      <div id="surface" class="chrome-surface"></div>
+      <button id="handle" class="chrome-handle" hidden title="Drag to reorder among siblings" aria-label="Drag to reorder">⣿</button>
+      <div id="drop" class="chrome-drop" hidden></div>
+    </main>
     <footer class="chrome-status" id="status">Open a .frwd file to begin.</footer>
     <style id="document-style"></style>
   `;
@@ -67,6 +85,10 @@ function build(): Shell {
     root,
     surface: root.querySelector("#surface") as HTMLElement,
     quarantine: root.querySelector("#quarantine") as HTMLElement,
+    breadcrumb: root.querySelector("#breadcrumb") as HTMLElement,
+    handle: root.querySelector("#handle") as HTMLButtonElement,
+    drop: root.querySelector("#drop") as HTMLElement,
+    stage: root.querySelector(".chrome-stage") as HTMLElement,
     style: root.querySelector("#document-style") as HTMLStyleElement,
     status: root.querySelector("#status") as HTMLElement,
   };
@@ -103,7 +125,132 @@ function render(): void {
   updateButtons();
 }
 
-let selectedId: string | null = null;
+/**
+ * Editor selection.
+ *
+ * Entirely editor state. The selected object is identified by its stable id -
+ * the one thing that is canonical - and everything else here, outlines,
+ * handles, breadcrumbs, is chrome that never reaches the document.
+ */
+interface Selection {
+  id: string;
+  /** The projected element, which is rebuilt whenever the document changes. */
+  element: HTMLElement;
+  parentId: string | null;
+  /** Position among identified siblings, and the siblings themselves. */
+  index: number;
+  siblings: string[];
+}
+
+let selection: Selection | null = null;
+
+function selectBlock(id: string | null): void {
+  for (const previous of Array.from(shell.surface.querySelectorAll(".is-selected"))) {
+    previous.classList.remove("is-selected");
+  }
+
+  if (!id || !session) {
+    selection = null;
+    shell.breadcrumb.replaceChildren();
+    shell.handle.hidden = true;
+    return;
+  }
+
+  const element = shell.surface.querySelector<HTMLElement>(`[${ID_ATTR}="${CSS.escape(id)}"]`);
+  if (!element) {
+    selection = null;
+    shell.handle.hidden = true;
+    return;
+  }
+
+  const siblings = identifiedSiblings(session.document, id);
+  const canonical = session.document.getElementById(id);
+  const parentNode: unknown = canonical?.parentNode;
+  const parentId =
+    parentNode !== null && parentNode !== undefined && isElement(parentNode as never)
+      ? (getAttr(parentNode as FrwdElement, ID_ATTR) ?? null)
+      : null;
+
+  selection = { id, element, parentId, index: siblings.indexOf(id), siblings };
+  element.classList.add("is-selected");
+
+  renderBreadcrumb();
+  positionHandle();
+}
+
+/**
+ * Where the selected object lives.
+ *
+ * Small on purpose - this is not an outline panel. It exists so nested
+ * selection is understandable and so the property controls that come later
+ * have an obvious target.
+ */
+function renderBreadcrumb(): void {
+  shell.breadcrumb.replaceChildren();
+  if (!selection || !session) return;
+
+  const trail: { label: string; id: string | null }[] = [];
+  let current: FrwdElement | null = session.document.getElementById(selection.id) ?? null;
+
+  while (current) {
+    const tag = current.tagName.toLowerCase();
+    const classes = (getAttr(current, "class") ?? "").trim().split(/s+/).filter(Boolean);
+    trail.unshift({
+      label: classes.length > 0 ? `${tag}.${classes[0]}` : tag,
+      id: getAttr(current, ID_ATTR) ?? null,
+    });
+    if (tag === "main") break;
+    const ancestor: unknown = current.parentNode;
+    current =
+      ancestor !== null && ancestor !== undefined && isElement(ancestor as never)
+        ? (ancestor as FrwdElement)
+        : null;
+  }
+
+  trail.forEach((step, position) => {
+    if (position > 0) {
+      const separator = document.createElement("span");
+      separator.className = "chrome-crumb-sep";
+      separator.textContent = "›";
+      shell.breadcrumb.appendChild(separator);
+    }
+
+    const isLast = position === trail.length - 1;
+    if (step.id && !isLast) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "chrome-crumb";
+      button.textContent = step.label;
+      button.dataset["crumbId"] = step.id;
+      button.addEventListener("click", () => {
+        commitRegion();
+        selectBlock(step.id);
+        say(`Selected ${step.label}.`);
+      });
+      shell.breadcrumb.appendChild(button);
+      return;
+    }
+
+    const label = document.createElement("span");
+    label.className = isLast ? "chrome-crumb is-current" : "chrome-crumb is-plain";
+    label.textContent = step.label;
+    shell.breadcrumb.appendChild(label);
+  });
+}
+
+/** Park the drag handle beside the selected object. Chrome, never document. */
+function positionHandle(): void {
+  if (!selection || session?.readOnly === true || selection.siblings.length < 2) {
+    shell.handle.hidden = true;
+    return;
+  }
+
+  const box = selection.element.getBoundingClientRect();
+  const stage = shell.stage.getBoundingClientRect();
+  shell.handle.hidden = false;
+  shell.handle.style.top = `${box.top - stage.top + shell.stage.scrollTop + 2}px`;
+  shell.handle.style.left = `${box.left - stage.left + shell.stage.scrollLeft - 26}px`;
+}
 
 function onBlockMouseDown(event: MouseEvent): void {
   const element = event.currentTarget as HTMLElement;
@@ -112,13 +259,9 @@ function onBlockMouseDown(event: MouseEvent): void {
   const id = element.getAttribute(ID_ATTR);
   if (!id) return;
 
-  if (selectedId !== id) {
+  if (selection?.id !== id) {
     commitRegion();
-    selectedId = id;
-    for (const other of Array.from(shell.surface.querySelectorAll(".is-selected"))) {
-      other.classList.remove("is-selected");
-    }
-    element.classList.add("is-selected");
+    selectBlock(id);
   }
 
   if (region?.block === element) return;
@@ -132,7 +275,7 @@ function onBlockMouseDown(event: MouseEvent): void {
 
   if (!EDITABLE_BLOCKS.has(element.tagName.toLowerCase())) {
     commitRegion();
-    say(`Selected <${element.tagName.toLowerCase()}> — move it, or select text inside a paragraph to edit.`);
+    say(`Selected <${element.tagName.toLowerCase()}>. Drag the handle to reorder it, or use the breadcrumb to go up.`);
     return;
   }
 
@@ -237,7 +380,7 @@ shell.root.querySelector("#open")!.addEventListener("change", async (event) => {
 
   const opened = EditorSession.open(await file.text());
   session = opened.session;
-  selectedId = null;
+  selectBlock(null);
   render();
 
   const errors = opened.result.diagnostics.filter((diagnostic) => diagnostic.severity === "error");
@@ -256,40 +399,33 @@ shell.root.querySelector("#link")!.addEventListener("click", () => {
 });
 
 shell.root.querySelector("#new-paragraph")!.addEventListener("click", () => {
-  if (!selectedId) return say("Select a block first.");
-  runOps([{ op: "insert_after", target: selectedId, html: "<p>New paragraph.</p>" }], "Inserted a paragraph.");
+  if (!selection) return say("Select a block first.");
+  const plan = planInsertion(session!.document, selection!.id);
+  if (!plan.ok) return say(plan.reason);
+  runOps([plan.operation], plan.describes);
 });
 
 shell.root.querySelector("#move-up")!.addEventListener("click", () => moveSelected("before"));
 shell.root.querySelector("#move-down")!.addEventListener("click", () => moveSelected("after"));
 
 function moveSelected(position: "before" | "after"): void {
-  if (!session || !selectedId) return say("Select a block first.");
-  const neighbour = siblingOf(selectedId, position);
-  if (!neighbour) return say("No sibling to move past.");
-  runOps(
-    [{ op: "move_node", target: selectedId, destination: neighbour, position }],
-    `Moved the block ${position} ${neighbour}.`,
-  );
+  if (!session || !selection) return say("Select a block first.");
+
+  const neighbour = selection.siblings[position === "before" ? selection.index - 1 : selection.index + 1];
+  if (!neighbour) return say("Nothing to move past: this is already the first or last object in its container.");
+
+  reorder(selection.id, neighbour, position);
 }
 
-function siblingOf(id: string, direction: "before" | "after"): string | null {
-  if (!session) return null;
-  const root = session.document.root;
-  if (!root) return null;
-
-  const identified: FrwdElement[] = [];
-  for (const element of walkElements(root)) {
-    if (getAttr(element, ID_ATTR) !== undefined) identified.push(element);
-  }
-  const target = session.document.getElementById(id);
-  if (!target) return null;
-
-  const parent = target.parentNode;
-  const siblings = identified.filter((element) => element.parentNode === parent);
-  const index = siblings.indexOf(target);
-  const neighbour = siblings[direction === "before" ? index - 1 : index + 1];
-  return neighbour ? (getAttr(neighbour, ID_ATTR) ?? null) : null;
+/**
+ * Commit a reorder.
+ *
+ * Through `move_node`, always. The thing on screen is a projection; dragging
+ * it around would move a picture of the document rather than the document.
+ */
+function reorder(id: string, destination: string, position: "before" | "after"): void {
+  runOps([{ op: "move_node", target: id, destination, position }], "Reordered.");
+  selectBlock(id);
 }
 
 shell.root.querySelector("#theme")!.addEventListener("click", () => {
@@ -335,6 +471,104 @@ shell.root.querySelector("#publish")!.addEventListener("click", () => {
   download(`${session.document.title ?? "document"}.frwd.html`, result.html, "text/html");
   say("Published.");
 });
+
+
+/**
+ * Dragging a block.
+ *
+ * Deliberately narrow: this reorders identified siblings inside one parent and
+ * nothing else. Drag changes semantic order in flow - it does not introduce
+ * coordinates, and there is no arrangement it can produce that the document
+ * could not already express.
+ *
+ * A drag that leaves the parent is refused and snaps back, because the honest
+ * answer to "what did you mean by that" is to ask rather than guess.
+ */
+function installDragHandle(): void {
+  let dragging: { id: string; siblings: Set<string> } | null = null;
+  let over: { id: string; position: "before" | "after" } | null = null;
+
+  const clearIndicator = (): void => {
+    shell.drop.hidden = true;
+    over = null;
+  };
+
+  const siblingUnderPointer = (event: PointerEvent): HTMLElement | null => {
+    if (!dragging) return null;
+    shell.handle.style.pointerEvents = "none";
+    const under = document.elementFromPoint(event.clientX, event.clientY);
+    shell.handle.style.pointerEvents = "";
+    if (!under) return null;
+
+    const candidate = (under as HTMLElement).closest<HTMLElement>(`[${ID_ATTR}]`);
+    if (!candidate) return null;
+
+    // Walk out to whichever ancestor is a sibling of the dragged object, so
+    // pointing at a paragraph inside a card targets the card.
+    let element: HTMLElement | null = candidate;
+    while (element) {
+      const id = element.getAttribute(ID_ATTR);
+      if (id && dragging.siblings.has(id) && id !== dragging.id) return element;
+      element = element.parentElement;
+    }
+    return null;
+  };
+
+  shell.handle.addEventListener("pointerdown", (event) => {
+    if (!selection || session?.readOnly === true) return;
+    event.preventDefault();
+    commitRegion();
+
+    dragging = { id: selection.id, siblings: new Set(selection.siblings) };
+    shell.handle.setPointerCapture(event.pointerId);
+    shell.handle.classList.add("is-dragging");
+    selection.element.classList.add("is-dragging");
+    say("Dragging. Release over a sibling to reorder, or anywhere else to cancel.");
+  });
+
+  shell.handle.addEventListener("pointermove", (event) => {
+    if (!dragging) return;
+
+    const target = siblingUnderPointer(event);
+    if (!target) return clearIndicator();
+
+    const box = target.getBoundingClientRect();
+    const stage = shell.stage.getBoundingClientRect();
+    const after = event.clientY > box.top + box.height / 2;
+
+    over = { id: target.getAttribute(ID_ATTR)!, position: after ? "after" : "before" };
+
+    shell.drop.hidden = false;
+    shell.drop.style.top = `${(after ? box.bottom : box.top) - stage.top + shell.stage.scrollTop - 1}px`;
+    shell.drop.style.left = `${box.left - stage.left + shell.stage.scrollLeft}px`;
+    shell.drop.style.width = `${box.width}px`;
+  });
+
+  const finish = (event: PointerEvent): void => {
+    if (!dragging) return;
+
+    const moved = dragging;
+    const destination = over;
+    dragging = null;
+    clearIndicator();
+    shell.handle.releasePointerCapture(event.pointerId);
+    shell.handle.classList.remove("is-dragging");
+    shell.surface.querySelector(".is-dragging")?.classList.remove("is-dragging");
+
+    if (!destination) {
+      say("Nothing changed: a block can only be reordered among its own siblings.");
+      positionHandle();
+      return;
+    }
+
+    reorder(moved.id, destination.id, destination.position);
+  };
+
+  shell.handle.addEventListener("pointerup", finish);
+  shell.handle.addEventListener("pointercancel", finish);
+}
+
+installDragHandle();
 
 const toolbar = shell.root.querySelector(".chrome-bar") as HTMLElement;
 

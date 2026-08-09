@@ -37,3 +37,31 @@ body { margin: 0; background: Canvas; color: CanvasText; }
 }
 .chrome-quarantine ul { margin: 0.5rem 0 0; padding-left: 1.1rem; }
 .chrome-quarantine code { font-family: ui-monospace, monospace; }
+
+/* Breadcrumb: where the selected object lives. */
+.chrome-breadcrumb {
+  display: flex; align-items: center; gap: 0.25rem; flex-wrap: wrap;
+  padding: 0.35rem 0.75rem; min-height: 1.9rem;
+  border-bottom: 1px solid rgba(128,128,128,0.25);
+  font: 400 0.75rem/1.4 ui-monospace, monospace;
+}
+.chrome-crumb { font: inherit; background: none; border: 0; padding: 0.1rem 0.25rem; border-radius: 3px; cursor: pointer; color: inherit; opacity: 0.75; }
+.chrome-crumb:hover { background: rgba(64,128,255,0.15); opacity: 1; }
+.chrome-crumb.is-current { font-weight: 700; opacity: 1; cursor: default; }
+.chrome-crumb.is-plain { opacity: 0.5; cursor: default; }
+.chrome-crumb-sep { opacity: 0.4; }
+
+/* Drag handle and drop indicator. Both are chrome: they live in the stage,
+   never in the document, and never survive a save. */
+.chrome-stage { position: relative; }
+.chrome-handle {
+  position: absolute; z-index: 5;
+  width: 20px; height: 20px; padding: 0; line-height: 1;
+  border: 1px solid rgba(128,128,128,0.5); border-radius: 4px;
+  background: Canvas; color: CanvasText; opacity: 0.55;
+  cursor: grab; font-size: 11px; touch-action: none;
+}
+.chrome-handle:hover { opacity: 1; }
+.chrome-handle.is-dragging { cursor: grabbing; opacity: 1; background: rgba(64,128,255,0.25); }
+.chrome-drop { position: absolute; z-index: 4; height: 3px; background: rgba(64,128,255,0.9); border-radius: 2px; pointer-events: none; }
+.chrome-surface .is-dragging { opacity: 0.45; }

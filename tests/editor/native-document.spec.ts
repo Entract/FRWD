@@ -141,12 +141,12 @@ test.describe("native document", () => {
     await focusBlock(page, paragraph);
 
     await page.click("#new-paragraph");
-    await expect(page.locator("#status")).toContainText("Inserted a paragraph");
+    await expect(page.locator("#status")).toContainText("Added a paragraph");
     expect(await source(page)).toContain("New paragraph.");
 
     await page.locator("#surface p[data-frwd-id]").nth(1).click();
     await page.click("#move-down");
-    await expect(page.locator("#status")).toContainText("Moved the block");
+    await expect(page.locator("#status")).toContainText("Reordered");
 
     await page.evaluate(() => {
       window.prompt = (message?: string) => (message?.includes("Theme token") ? "--accent" : "#b03030");
