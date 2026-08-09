@@ -7,6 +7,6 @@
     "lib": ["ES2023", "DOM"],
     "types": ["node"]
   },
-  "include": ["tests/browser/**/*.ts"],
+  "include": ["tests/browser/**/*.ts", "tests/editor/**/*.ts", "playwright.editor.config.ts"],
   "references": [{ "path": "./packages/format" }, { "path": "./packages/publisher" }, { "path": "./packages/operations" }]
 }

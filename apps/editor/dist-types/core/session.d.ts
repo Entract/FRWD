@@ -25,6 +25,18 @@ export interface ChangeResult {
 }
 export declare class EditorSession {
     document: FrwdDocument;
+    /**
+     * A document that failed to open cleanly is readable and diagnosable, and
+     * nothing more.
+     *
+     * The load pipeline says a non-conforming or non-native file is quarantined
+     * rather than edited, and this is where that is true - not in the shell.
+     * A rule enforced only by the UI is a rule that holds until someone calls the
+     * session from somewhere else. Publishing or importing such a file is a
+     * separate, explicit act, and not one this class performs by accident.
+     */
+    readonly readOnly: boolean;
+    readonly diagnostics: readonly Diagnostic[];
     private past;
     private future;
     private constructor();
@@ -40,6 +52,7 @@ export declare class EditorSession {
     };
     get canUndo(): boolean;
     get canRedo(): boolean;
+    private refuseIfReadOnly;
     /** Capture the current state as an undo point. Call before mutating. */
     checkpoint(): void;
     /**

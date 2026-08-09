@@ -50,6 +50,22 @@ Undo currently stores whole-document snapshots. That is honest rather than cleve
 
 Pasted HTML is imported content and crosses the same trust boundary as a file: it goes through the safety profile before it reaches the document. Unlike opening a file, repairing here is right — the user is asking to bring the content in, not to have it preserved as received.
 
+## Read-only is a session property
+
+A file that does not open as a conforming native FRWD is displayed, diagnosed and quarantined. Not partly: no region mounts, no text is editable, no formatting applies, no operation runs, and it cannot be saved over as though it were native. Opening a `.frwd.html` publication lands here, because a publication carries the runtime and a native FRWD carries no script.
+
+The rule lives on `EditorSession`, not in the toolbar. A rule enforced only by the UI holds until someone calls the session from somewhere else.
+
+Importing or converting such a file is a separate, deliberate act, and not one this slice performs.
+
+## Tests
+
+```bash
+pnpm test:editor     # drives the real UI against a dev server
+```
+
+The region model has its own coverage in the `file://` browser suite; this one exists for the wiring between a person and that model, which is where manual use found bugs the model's tests could not see. It uses the actual toolbar buttons on purpose.
+
 ## Not in this slice
 
 Cross-block selection, multi-block paste, Enter and Backspace across block boundaries, comments, collaboration, and the AI panel. `t-023` already defines the seam the AI panel plugs into.

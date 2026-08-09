@@ -23,6 +23,7 @@
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest",
     "test:browser": "pnpm build && playwright test --pass-with-no-tests",
+    "test:editor": "pnpm build && playwright test -c playwright.editor.config.ts",
     "fixtures:canonicalize": "pnpm build && node scripts/canonicalize-fixtures.mjs",
     "clean": "tsc --build --clean"
   },

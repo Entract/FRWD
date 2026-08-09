@@ -26,3 +26,14 @@ body { margin: 0; background: Canvas; color: CanvasText; }
    canonical document, and never survives a save. */
 .chrome-surface .is-selected { outline: 2px solid rgba(64,128,255,0.8); outline-offset: 3px; }
 .chrome-surface [data-frwd-opaque] { outline: 1px dashed rgba(128,128,128,0.7); border-radius: 2px; }
+
+/* Quarantine notice for a file that did not open as conforming native FRWD. */
+.chrome-quarantine {
+  padding: 0.75rem 1rem;
+  background: rgba(200, 90, 40, 0.12);
+  border-bottom: 1px solid rgba(200, 90, 40, 0.4);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+.chrome-quarantine ul { margin: 0.5rem 0 0; padding-left: 1.1rem; }
+.chrome-quarantine code { font-family: ui-monospace, monospace; }

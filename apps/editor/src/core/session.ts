@@ -33,11 +33,26 @@ const UNDO_LIMIT = 50;
 export class EditorSession {
   document: FrwdDocument;
 
+  /**
+   * A document that failed to open cleanly is readable and diagnosable, and
+   * nothing more.
+   *
+   * The load pipeline says a non-conforming or non-native file is quarantined
+   * rather than edited, and this is where that is true - not in the shell.
+   * A rule enforced only by the UI is a rule that holds until someone calls the
+   * session from somewhere else. Publishing or importing such a file is a
+   * separate, explicit act, and not one this class performs by accident.
+   */
+  readonly readOnly: boolean;
+  readonly diagnostics: readonly Diagnostic[];
+
   private past: string[] = [];
   private future: string[] = [];
 
-  private constructor(document: FrwdDocument) {
+  private constructor(document: FrwdDocument, diagnostics: Diagnostic[], readOnly: boolean) {
     this.document = document;
+    this.diagnostics = diagnostics;
+    this.readOnly = readOnly;
   }
 
   /**
@@ -52,13 +67,11 @@ export class EditorSession {
     const profile = inspect(document.tree);
     const diagnostics = [...structural, ...profile];
 
+    const conforming = !diagnostics.some((diagnostic) => diagnostic.severity === "error");
+
     return {
-      session: new EditorSession(document),
-      result: {
-        ok: true,
-        diagnostics,
-        conforming: !diagnostics.some((diagnostic) => diagnostic.severity === "error"),
-      },
+      session: new EditorSession(document, diagnostics, !conforming),
+      result: { ok: true, diagnostics, conforming },
     };
   }
 
@@ -68,6 +81,17 @@ export class EditorSession {
 
   get canRedo(): boolean {
     return this.future.length > 0;
+  }
+
+  private refuseIfReadOnly(): Diagnostic[] {
+    return [
+      {
+        severity: "error",
+        code: "document-read-only",
+        message:
+          "This document did not open as a conforming native FRWD, so it is read-only. Nothing here will be changed.",
+      },
+    ];
   }
 
   /** Capture the current state as an undo point. Call before mutating. */
@@ -85,6 +109,7 @@ export class EditorSession {
    * fine-grained history while focused.
    */
   commitRegionEdit(before: string): void {
+    if (this.readOnly) return;
     this.past.push(before);
     if (this.past.length > UNDO_LIMIT) this.past.shift();
     this.future.length = 0;
@@ -93,6 +118,8 @@ export class EditorSession {
 
   /** Run FRWD operations. Atomic: a rejected transaction changes nothing. */
   run(operations: Operation[]): ChangeResult {
+    if (this.readOnly) return { ok: false, errors: this.refuseIfReadOnly(), summary: [] };
+
     const before = this.document.toHtml();
     const result = apply(this.document, {
       protocol: "frwd-ops",
@@ -112,6 +139,7 @@ export class EditorSession {
   }
 
   undo(): boolean {
+    if (this.readOnly) return false;
     const previous = this.past.pop();
     if (previous === undefined) return false;
     this.future.push(this.document.toHtml());
@@ -120,6 +148,7 @@ export class EditorSession {
   }
 
   redo(): boolean {
+    if (this.readOnly) return false;
     const next = this.future.pop();
     if (next === undefined) return false;
     this.past.push(this.document.toHtml());

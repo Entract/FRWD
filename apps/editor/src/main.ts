@@ -21,6 +21,7 @@ const EDITABLE_BLOCKS = new Set(["p", "h1", "h2", "h3", "h4", "h5", "h6", "li", 
 interface Shell {
   root: HTMLElement;
   surface: HTMLElement;
+  quarantine: HTMLElement;
   style: HTMLStyleElement;
   status: HTMLElement;
 }
@@ -34,7 +35,7 @@ function build(): Shell {
   root.innerHTML = `
     <header class="chrome-bar">
       <strong class="chrome-brand">FRWD</strong>
-      <input type="file" id="open" accept=".frwd,.html" />
+      <input type="file" id="open" accept=".frwd" />
       <span class="chrome-group">
         <button id="bold" title="Bold (Ctrl+B)"><b>B</b></button>
         <button id="italic" title="Italic (Ctrl+I)"><i>I</i></button>
@@ -56,6 +57,7 @@ function build(): Shell {
       <button id="save">Save .frwd</button>
       <button id="publish">Publish .frwd.html</button>
     </header>
+    <div id="quarantine" class="chrome-quarantine" hidden></div>
     <main class="chrome-stage"><div id="surface" class="chrome-surface"></div></main>
     <footer class="chrome-status" id="status">Open a .frwd file to begin.</footer>
     <style id="document-style"></style>
@@ -64,6 +66,7 @@ function build(): Shell {
   return {
     root,
     surface: root.querySelector("#surface") as HTMLElement,
+    quarantine: root.querySelector("#quarantine") as HTMLElement,
     style: root.querySelector("#document-style") as HTMLStyleElement,
     status: root.querySelector("#status") as HTMLElement,
   };
@@ -119,6 +122,14 @@ function onBlockMouseDown(event: MouseEvent): void {
   }
 
   if (region?.block === element) return;
+
+  // The load pipeline's rule, enforced where a user would meet it: a document
+  // that did not open as conforming native FRWD is readable and nothing else.
+  if (session?.readOnly === true) {
+    say("This document is read-only: it did not open as a conforming native FRWD.");
+    return;
+  }
+
   if (!EDITABLE_BLOCKS.has(element.tagName.toLowerCase())) {
     commitRegion();
     say(`Selected <${element.tagName.toLowerCase()}> — move it, or select text inside a paragraph to edit.`);
@@ -165,9 +176,36 @@ function commitRegion(): void {
   regionSnapshot = null;
 }
 
+const MUTATING_CONTROLS = ["#bold", "#italic", "#link", "#new-paragraph", "#move-up", "#move-down", "#theme", "#save"];
+
 function updateButtons(): void {
-  (shell.root.querySelector("#undo") as HTMLButtonElement).disabled = !session?.canUndo;
-  (shell.root.querySelector("#redo") as HTMLButtonElement).disabled = !session?.canRedo;
+  const readOnly = session?.readOnly === true;
+
+  for (const selector of MUTATING_CONTROLS) {
+    (shell.root.querySelector(selector) as HTMLButtonElement).disabled = readOnly;
+  }
+  (shell.root.querySelector("#undo") as HTMLButtonElement).disabled = readOnly || !session?.canUndo;
+  (shell.root.querySelector("#redo") as HTMLButtonElement).disabled = readOnly || !session?.canRedo;
+
+  shell.quarantine.hidden = !readOnly;
+  if (readOnly && session) {
+    const errors = session.diagnostics.filter((diagnostic) => diagnostic.severity === "error");
+    shell.quarantine.innerHTML =
+      "<strong>Read-only.</strong> This file did not open as a conforming native FRWD, so nothing here can be changed. " +
+      "Publishing or importing it is a separate, deliberate step.<ul>" +
+      errors
+        .slice(0, 6)
+        .map((error) => `<li><code>${error.code}</code> ${escapeHtml(error.message)}</li>`)
+        .join("") +
+      (errors.length > 6 ? `<li>and ${errors.length - 6} more</li>` : "") +
+      "</ul>";
+  }
+}
+
+function escapeHtml(value: string): string {
+  const holder = document.createElement("span");
+  holder.textContent = value;
+  return holder.innerHTML;
 }
 
 function runOps(operations: Parameters<EditorSession["run"]>[0], done: string): void {
@@ -298,6 +336,32 @@ shell.root.querySelector("#publish")!.addEventListener("click", () => {
   say("Published.");
 });
 
-document.addEventListener("mousedown", (event) => {
-  if (!shell.surface.contains(event.target as Node)) commitRegion();
+const toolbar = shell.root.querySelector(".chrome-bar") as HTMLElement;
+
+// Pressing a toolbar button must not take focus or selection away from the
+// region it is about to act on. Without this the sequence is: toolbar
+// mousedown, outside-surface handler commits the region, click handler finds
+// nothing to format - which is exactly why bold and italic did nothing while
+// the keyboard shortcuts worked.
+toolbar.addEventListener("mousedown", (event) => {
+  const target = event.target as HTMLElement;
+  if (target.closest("button")) event.preventDefault();
 });
+
+document.addEventListener("mousedown", (event) => {
+  const target = event.target as Node;
+  if (shell.surface.contains(target)) return;
+  if (toolbar.contains(target)) return;
+  commitRegion();
+});
+
+// Dev-only introspection for the end-to-end suite. Not present in a build:
+// tests should drive the real UI, and the one thing they cannot see from the
+// outside is the canonical source.
+if (import.meta.env.DEV) {
+  (window as unknown as { __frwdEditor: unknown }).__frwdEditor = {
+    source: () => session?.save() ?? null,
+    readOnly: () => session?.readOnly ?? null,
+    diagnostics: () => session?.diagnostics.map((diagnostic) => diagnostic.code) ?? [],
+  };
+}
