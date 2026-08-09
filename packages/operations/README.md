@@ -119,13 +119,16 @@ smuggle a remote reference into the document. Ambiguity is refused rather than
 resolved: two `:root` rules in one scope declaring the same token means source
 order decides the winner, and guessing which was meant is not this package's job.
 
-It is the **only** style operation, on purpose. FRWD provides safe mechanisms for
-changing document-owned design; it does not standardise the design vocabulary of
-individual documents. `wide` and `main-sidebar` are classes our fixtures happen
-to define, not format concepts, and `set_attribute` on `class` already reaches
-them. A high-level `set_figure_variant()` belongs in an editor that can read
-which variants a given document actually defines, and compiles to
-`set_attribute`.
+It is the **document-wide** style operation. Local changes to one object are
+`set_style_property` below, and the two are deliberately separate: a token is a
+decision about the whole document, an override is a decision about one thing in
+it.
+
+What is still absent is any FRWD vocabulary of design. `wide` and
+`main-sidebar` are classes our fixtures happen to define, not format concepts,
+and `set_attribute` on `class` already reaches them. A high-level
+`set_figure_variant()` belongs in an editor that can read which variants a given
+document actually defines, and compiles to `set_attribute`.
 
 ### `set_style_property` is one declaration on one element
 
