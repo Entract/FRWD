@@ -62,7 +62,7 @@ Early. The specification is at draft 0.1 and the format will change before it is
 | `packages/operations` | Atomic transactions of deterministic semantic edit operations |
 | `packages/publisher` + `runtime` | `.frwd.html` emission, trusted runtime, publication validation |
 | `fixtures/business-report` | A designed reference document — the demonstration, not just test data |
-| `apps/editor` | Not started — deliberately last |
+| `apps/editor` | MVP: open, edit text, move blocks, theme tokens, save, publish |
 
 ## Explore
 

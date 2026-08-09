@@ -1,7 +1,7 @@
-import { serialize as parse5Serialize } from "parse5";
+import { serializeOuter as parse5SerializeOuter, serialize as parse5Serialize } from "parse5";
 import { ID_ATTR } from "./constants.js";
 import { isElement, walk } from "./dom.js";
-import type { Attribute, Document, Node } from "./types.js";
+import type { Attribute, Document, Element, Node } from "./types.js";
 
 /**
  * Deterministic serialization.
@@ -55,4 +55,16 @@ export function canonicalizeAttributes(root: Node): void {
 export function serializeDocument(document: Document): string {
   canonicalizeAttributes(document);
   return parse5Serialize(document);
+}
+
+/**
+ * Serialize a single element, including the element itself.
+ *
+ * Used where a caller needs one part of the document as markup - rendering the
+ * document root into a host page, for instance - without serializing the whole
+ * file around it.
+ */
+export function serializeElement(element: Element): string {
+  canonicalizeAttributes(element);
+  return parse5SerializeOuter(element);
 }

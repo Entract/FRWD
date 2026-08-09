@@ -57,7 +57,7 @@ export { readAssets } from "./assets.js";
 
 export { findStyleElement, readDocumentStyle, writeDocumentStyle } from "./style.js";
 
-export { canonicalizeAttributes, serializeDocument } from "./serialize.js";
+export { canonicalizeAttributes, serializeDocument, serializeElement } from "./serialize.js";
 
 export type {
   Attribute,

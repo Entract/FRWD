@@ -21,8 +21,8 @@
     {
       "id": "t-010",
       "title": "apps/editor - minimal flowing edit surface",
-      "description": "The MVP editor slice, after the t-024 ADR settles the architecture. Modest on purpose: open a real .frwd, render with its own document CSS, directly edit ordinary text, basic inline bold/italic/link, insert a paragraph, preserve and mint stable ids correctly, select and move one semantic block such as a figure, change a theme token, undo and redo, save .frwd, publish .frwd.html. No AI panel - t-023 already defines the seam it plugs into later.",
-      "status": "pending",
+      "description": "The MVP editor slice, after the t-024 ADR settles the architecture. Modest on purpose: open a real .frwd, render with its own document CSS, directly edit ordinary text, basic inline bold/italic/link, insert a paragraph, preserve and mint stable ids correctly, select and move one semantic block such as a figure, change a theme token, undo and redo, save .frwd, publish .frwd.html. No AI panel - t-023 already defines the seam it plugs into later. Engine choice for this slice: bare ProseMirror scoped to one block - an implementation choice, not a FRWD dependency. Region schema stays narrow: text, strong, emphasis, link, hard break, and an opaque inline atom that preserves valid inline content the region editor does not understand (inline MathML, unknown inline elements) as uneditable-but-preserved rather than normalising it away. If the view mounts on the real FRWD block element, everything it adds is editor chrome and must not survive commit. Paste crosses the same trust boundary as any other import and goes through the safety profile. Region history is transient and local; the durable undo model belongs to the editor, with a whole region edit committing as one entry alongside FRWD Ops.",
+      "status": "in-progress",
       "dependsOn": [
         "t-024"
       ],
@@ -69,7 +69,7 @@
       "id": "t-024",
       "title": "Editor architecture spike and ADR: who owns the FRWD document model",
       "description": "Answer one question with evidence before any editor is built: does the structured editing engine own the whole FRWD document model, or does it edit rich-text regions while the validated FRWD DOM stays authoritative? FRWD canonical form is semantic HTML; ProseMirror deliberately uses its own schema-constrained representation and Tiptap documents warn that non-conforming HTML can be lost. FRWD carries arbitrary section structure, stable ids, inline and display MathML, SVG, tables, frwd-* custom elements, inert dataset blocks, document-defined classes and attributes, and embedded media - so the distinction is real rather than theoretical. Run an adversarial round-trip spike using the business report, rich manual and scientific paper: parse into a structured-editor document model and serialize back with no edit, then measure what survives. Record the result as an ADR covering approach A (whole-document structured model) versus approach B (FRWD-DOM-native with structured rich-text regions), and how human fine-grained editing transactions meet FRWD semantic transactions without creating two durable document models.",
-      "status": "in-progress",
+      "status": "done",
       "dependsOn": [],
       "assignee": "claude",
       "category": "feature",
@@ -79,7 +79,8 @@
         "tests/browser"
       ],
       "canParallelize": false,
-      "planDoc": "07_EDITOR_ARCHITECTURE.md"
+      "planDoc": "07_EDITOR_ARCHITECTURE.md",
+      "completedCommit": "0578774fbdfa746e3256eafed7c120b20f8eb4b2"
     }
   ],
   "nextId": 25

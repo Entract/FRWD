@@ -1,0 +1,28 @@
+/* Editor chrome only. Nothing here describes a document, and nothing here is
+   ever serialized into one - the document brings its own stylesheet, which the
+   shell injects separately and does not touch. */
+:root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, sans-serif; }
+* { box-sizing: border-box; }
+body { margin: 0; background: Canvas; color: CanvasText; }
+#app { display: grid; grid-template-rows: auto 1fr auto; height: 100vh; }
+
+.chrome-bar {
+  display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;
+  padding: 0.5rem 0.75rem; border-bottom: 1px solid rgba(128,128,128,0.35);
+  font-size: 0.8125rem;
+}
+.chrome-brand { letter-spacing: 0.1em; opacity: 0.7; }
+.chrome-group { display: inline-flex; gap: 0.25rem; padding-left: 0.5rem; border-left: 1px solid rgba(128,128,128,0.3); }
+.chrome-spacer { flex: 1; }
+.chrome-bar button { font: inherit; padding: 0.3rem 0.6rem; cursor: pointer; }
+.chrome-bar button:disabled { opacity: 0.4; cursor: default; }
+
+.chrome-stage { overflow: auto; padding: 1.5rem; background: rgba(128,128,128,0.08); }
+.chrome-surface { background: Canvas; margin-inline: auto; max-width: 62rem; box-shadow: 0 1px 12px rgba(0,0,0,0.12); }
+
+.chrome-status { padding: 0.5rem 0.75rem; border-top: 1px solid rgba(128,128,128,0.35); font-size: 0.75rem; opacity: 0.85; }
+
+/* Selection is chrome. It is applied to the projection on screen, never to the
+   canonical document, and never survives a save. */
+.chrome-surface .is-selected { outline: 2px solid rgba(64,128,255,0.8); outline-offset: 3px; }
+.chrome-surface [data-frwd-opaque] { outline: 1px dashed rgba(128,128,128,0.7); border-radius: 2px; }

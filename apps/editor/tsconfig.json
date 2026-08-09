@@ -1,0 +1,36 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist-types",
+    "lib": [
+      "ES2023",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "types": [],
+    "emitDeclarationOnly": true,
+    "moduleResolution": "bundler",
+    "module": "preserve"
+  },
+  "include": [
+    "src/**/*.ts"
+  ],
+  "exclude": [
+    "src/**/*.test.ts"
+  ],
+  "references": [
+    {
+      "path": "../../packages/format"
+    },
+    {
+      "path": "../../packages/sanitize"
+    },
+    {
+      "path": "../../packages/operations"
+    },
+    {
+      "path": "../../packages/publisher"
+    }
+  ]
+}
